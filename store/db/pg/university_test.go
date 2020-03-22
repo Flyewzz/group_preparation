@@ -1,6 +1,7 @@
 package pg
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -121,13 +122,13 @@ func TestGetAll(t *testing.T) {
 	for _, u := range expectedUniversities {
 		correctedRows.AddRow(u.Id, u.Name)
 	}
-	mock.ExpectQuery("SELECT (.+) from universities").
+	mock.ExpectQuery("SELECT (.+) FROM universities").
 		WillReturnRows(correctedRows)
 	// mock.ExpectCommit()
 
 	defer db.Close()
 
-	usc := NewUniversityStoreControllerPg(5, db)
+	usc := NewUniversityControllerPg(5, db)
 	actualUniversities, err := usc.GetAll()
 	if err != nil {
 		t.Errorf("Error: %v\n", err)
@@ -180,111 +181,90 @@ func TestGetAll(t *testing.T) {
 // }
 // }
 
-// func TestStoreController_GetById(t *testing.T) {
-// 	testUniversitys := getTestUniversitys()
-// 	mapUniversitys := map[int]*University{
-// 		1: &testUniversitys[0],
-// 		2: &testUniversitys[1],
-// 		3: &testUniversitys[2],
-// 		4: &testUniversitys[3],
-// 	}
-// 	type fields struct {
-// 		currentId   int
-// 		Universitys map[int]*University
-// 	}
-// 	type args struct {
-// 		id int
-// 	}
-// 	tests := []struct {
-// 		name    string
-// 		fields  fields
-// 		args    args
-// 		want    *University
-// 		wantErr bool
-// 	}{
-// 		{
-// 			name: "get 3",
-// 			fields: fields{
-// 				currentId:   4,
-// 				Universitys: mapUniversitys,
-// 			},
-// 			args: args{
-// 				id: 3,
-// 			},
-// 			want:    mapUniversitys[3],
-// 			wantErr: false,
-// 		},
+func TestGetById(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Error("Cannot creating mock database\n")
+	}
+	columns := []string{
+		"university_id",
+		"name",
+	}
+	universities := getTestUniversities()
+	type args struct {
+		id int
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *University
+		wantErr bool
+	}{
+		{
+			name: "get 3",
+			args: args{
+				id: 3,
+			},
+			want:    &universities[2],
+			wantErr: false,
+		},
+		{
+			name: "get 1",
+			args: args{
+				id: 1,
+			},
+			want:    &universities[0],
+			wantErr: false,
+		},
+		{
+			name: "get 5",
+			args: args{
+				id: 5,
+			},
+			want:    &universities[4],
+			wantErr: false,
+		},
+		{
+			name:    "get 0",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "get -5",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "get 9999",
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	// sqlmock.New
+	correctedRows := sqlmock.NewRows(columns)
+	for _, u := range universities {
+		correctedRows.AddRow(u.Id, u.Name)
+	}
+	mock.ExpectQuery("SELECT university_id, name FROM universities WHERE university_id = (.+)").
+		WillReturnRows()
+	// mock.ExpectCommit()
 
-// 		{
-// 			name: "get 2",
-// 			fields: fields{
-// 				currentId:   4,
-// 				Universitys: mapUniversitys,
-// 			},
-// 			args: args{
-// 				id: 2,
-// 			},
-// 			want:    mapUniversitys[2],
-// 			wantErr: false,
-// 		},
+	defer db.Close()
 
-// 		{
-// 			name: "get 4",
-// 			fields: fields{
-// 				currentId:   4,
-// 				Universitys: mapUniversitys,
-// 			},
-// 			args: args{
-// 				id: 4,
-// 			},
-// 			want:    mapUniversitys[4],
-// 			wantErr: false,
-// 		},
-
-// 		{
-// 			name: "get 0",
-// 			fields: fields{
-// 				currentId:   4,
-// 				Universitys: mapUniversitys,
-// 			},
-// 			args: args{
-// 				id: 0,
-// 			},
-// 			want:    nil,
-// 			wantErr: true,
-// 		},
-
-// 		{
-// 			name: "get -5",
-// 			fields: fields{
-// 				currentId:   4,
-// 				Universitys: mapUniversitys,
-// 			},
-// 			args: args{
-// 				id: -5,
-// 			},
-// 			want:    nil,
-// 			wantErr: true,
-// 		},
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			sc := newMockStoreController(
-// 				2,
-// 				tt.fields.currentId,
-// 				tt.fields.Universitys,
-// 			)
-// 			got, err := sc.GetById(tt.args.id)
-// 			if (err != nil) != tt.wantErr {
-// 				t.Errorf("StoreController.GetById() error = %v, wantErr %v", err, tt.wantErr)
-// 				return
-// 			}
-// 			if !reflect.DeepEqual(got, tt.want) {
-// 				t.Errorf("StoreController.GetById() = %v, want %v", got, tt.want)
-// 			}
-// 		})
-// 	}
-// }
+	usc := NewUniversityControllerPg(5, db)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := usc.GetById(tt.args.id)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("UniversityControllerPb.GetById() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("UniversityControllerPb.GetById() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
 
 // func TestStoreController_RemoveById(t *testing.T) {
 // 	testUniversitys := getTestUniversitys()
