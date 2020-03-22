@@ -128,8 +128,8 @@ func TestGetAll(t *testing.T) {
 
 	defer db.Close()
 
-	usc := NewUniversityControllerPg(5, db)
-	actualUniversities, err := usc.GetAll()
+	uc := NewUniversityControllerPg(5, db)
+	actualUniversities, err := uc.GetAll()
 	if err != nil {
 		t.Errorf("Error: %v\n", err)
 	}
@@ -251,10 +251,10 @@ func TestGetById(t *testing.T) {
 
 	defer db.Close()
 
-	usc := NewUniversityControllerPg(5, db)
+	uc := NewUniversityControllerPg(5, db)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := usc.GetById(tt.args.id)
+			got, err := uc.GetById(tt.args.id)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("UniversityControllerPb.GetById() error = %v, wantErr %v", err, tt.wantErr)
 				return

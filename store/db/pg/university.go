@@ -19,37 +19,69 @@ func NewUniversityControllerPg(itemsPerPage int, db *sql.DB) *UniversityControll
 	}
 }
 
-func (usc *UniversityControllerPg) SearchByName(name int) ([]models.University, error) {
+func (uc *UniversityControllerPg) SearchByName(name int) ([]models.University, error) {
 	return nil, nil
 }
 
-func (usc *UniversityControllerPg) GetAllSubjects(universityId int) ([]models.Subject, error) {
-	return nil, nil
+func (uc *UniversityControllerPg) GetAllSubjects(universityId int) ([]models.Subject, error) {
+	rows, err := uc.db.Query("SELECT subject_id, name, semester from subjects s" +
+		"INNER JOIN universities u ON s.university_id = u.university_id")
+	if err != nil {
+		return nil, err
+	}
+	var subjects []models.Subject
+	defer rows.Close()
+	for rows.Next() {
+		var subject models.Subject
+		err = rows.Scan(&subject.Id, &subject.Name, &subject.Semester)
+		if err != nil {
+			continue
+		}
+		subjects = append(subjects, subject)
+	}
+	return subjects, nil
 }
 
-func (usc *UniversityControllerPg) GetSubjectsByPage(universityId, page int) ([]models.Subject, error) {
-	return nil, nil
+func (uc *UniversityControllerPg) GetSubjectsByPage(universityId, page int) ([]models.Subject, error) {
+	itemsPerPage := uc.itemsPerPage
+	rows, err := uc.db.Query("SELECT subject_id, name, semester FROM subjects s "+
+		"INNER JOIN universities u ON s.university_id = u.university_id LIMIT $1 OFFSET $2",
+		itemsPerPage, itemsPerPage*(page-1))
+	if err != nil {
+		return nil, err
+	}
+	var subjects []models.Subject
+	defer rows.Close()
+	for rows.Next() {
+		var subject models.Subject
+		err = rows.Scan(&subject.Id, &subject.Name, &subject.Semester)
+		if err != nil {
+			continue
+		}
+		subjects = append(subjects, subject)
+	}
+	return subjects, nil
 }
 
-func (usc *UniversityControllerPg) GetAll() ([]University, error) {
-	rows, err := usc.db.Query("SELECT university_id, name FROM universities")
+func (uc *UniversityControllerPg) GetAll() ([]University, error) {
+	rows, err := uc.db.Query("SELECT university_id, name FROM universities")
 	var universities []University
 	if err != nil {
 		// 'universities' is an empty struct
 		return universities, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var u University
 		rows.Scan(&u.Id, &u.Name)
 		universities = append(universities, u)
 	}
-	defer rows.Close()
 	return universities, nil
 }
 
-func (usc *UniversityControllerPg) GetByPage(page int) ([]University, error) {
-	itemsPerPage := usc.itemsPerPage
-	rows, err := usc.db.Query("SELECT university_id, name FROM universities LIMIT $1 OFFSET $2",
+func (uc *UniversityControllerPg) GetByPage(page int) ([]University, error) {
+	itemsPerPage := uc.itemsPerPage
+	rows, err := uc.db.Query("SELECT university_id, name FROM universities LIMIT $1 OFFSET $2",
 		itemsPerPage, itemsPerPage*(page-1))
 	if err != nil {
 		return nil, err
@@ -64,8 +96,8 @@ func (usc *UniversityControllerPg) GetByPage(page int) ([]University, error) {
 	return universities, nil
 }
 
-func (usc *UniversityControllerPg) GetById(id int) (*University, error) {
-	row := usc.db.QueryRow("SELECT university_id, name FROM universities WHERE university_id = $1", id)
+func (uc *UniversityControllerPg) GetById(id int) (*University, error) {
+	row := uc.db.QueryRow("SELECT university_id, name FROM universities WHERE university_id = $1", id)
 	var u *University
 	err := row.Scan(&u.Id, &u.Name)
 	if err != nil {
@@ -74,22 +106,22 @@ func (usc *UniversityControllerPg) GetById(id int) (*University, error) {
 	return u, nil
 }
 
-func (usc *UniversityControllerPg) Add(name string) (int, error) {
+func (uc *UniversityControllerPg) Add(name string) (int, error) {
 	var idUniversity int
-	err := usc.db.QueryRow("INSERT INTO universities (name) VALUES ($1) RETURNING university_id", name).Scan(&idUniversity)
+	err := uc.db.QueryRow("INSERT INTO universities (name) VALUES ($1) RETURNING university_id", name).Scan(&idUniversity)
 	if err != nil {
 		return 0, err
 	}
 	return idUniversity, nil
 }
 
-func (usc *UniversityControllerPg) RemoveById(id int) error {
-	_, err := usc.db.Exec("DELETE FROM univerisities WHERE university_id = $1", id)
+func (uc *UniversityControllerPg) RemoveById(id int) error {
+	_, err := uc.db.Exec("DELETE FROM univerisities WHERE university_id = $1", id)
 	return err
 }
 
-func (usc *UniversityControllerPg) RemoveAll() error {
-
-	_, err := usc.db.Exec("TRUNCATE TABLE universities;")
+func (uc *UniversityControllerPg) RemoveAll() error {
+	// #! Removed all the subjects too. Be careful!
+	_, err := uc.db.Exec("TRUNCATE TABLE universities CASCADE")
 	return err
 }

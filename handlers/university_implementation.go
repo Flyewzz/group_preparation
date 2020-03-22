@@ -2,22 +2,48 @@ package handlers
 
 import (
 	"encoding/json"
+	"strconv"
+
 	// "fmt"
 	// "log"
 	"net/http"
-	// "strconv"
 	// . "github.com/Flyewzz/golang-itv/features"
 	// "github.com/Flyewzz/golang-itv/models"
 )
 
 func (hd *HandlerData) AllUniversitiesHandler(w http.ResponseWriter, r *http.Request) {
-	univerisites, err := hd.UniversityController.GetAll()
+	universities, err := hd.UniversityController.GetAll()
 	if err != nil {
 		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
 		return
 	}
-	data, _ := json.Marshal(univerisites)
+	data, _ := json.Marshal(universities)
 	w.Write(data)
+}
+
+func (hd *HandlerData) AllSubjectsHandler(w http.ResponseWriter, r *http.Request) {
+	strId := r.URL.Query().Get("id")
+	id, err := strconv.Atoi(strId)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	subjects, err := hd.UniversityController.GetAllSubjects(id)
+	if err != nil {
+		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		return
+	}
+	data, _ := json.Marshal(subjects)
+	w.Write(data)
+}
+
+func (hd *HandlerData) AllUniversitiesRemoveHandler(w http.ResponseWriter, r *http.Request) {
+	err := hd.UniversityController.RemoveAll()
+	if err != nil {
+		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		return
+	}
+	w.Write([]byte("All universities was successfully deleted."))
 }
 
 // func (hd *HandlerData) RequestHandler(w http.ResponseWriter, r *http.Request) {
