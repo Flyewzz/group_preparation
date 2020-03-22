@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Flyewzz/golang-itv/handlers"
+	"github.com/Flyewzz/group_preparation/handlers"
 	"github.com/spf13/viper"
 )
 

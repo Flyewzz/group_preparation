@@ -3,6 +3,7 @@ package pg
 import (
 	"database/sql"
 
+	"github.com/Flyewzz/group_preparation/models"
 	. "github.com/Flyewzz/group_preparation/models"
 )
 
@@ -16,6 +17,18 @@ func NewUniversityControllerPg(itemsPerPage int, db *sql.DB) *UniversityControll
 		itemsPerPage: itemsPerPage,
 		db:           db,
 	}
+}
+
+func (usc *UniversityControllerPg) SearchByName(name int) ([]models.University, error) {
+	return nil, nil
+}
+
+func (usc *UniversityControllerPg) GetAllSubjects(universityId int) ([]models.Subject, error) {
+	return nil, nil
+}
+
+func (usc *UniversityControllerPg) GetSubjectsByPage(universityId, page int) ([]models.Subject, error) {
+	return nil, nil
 }
 
 func (usc *UniversityControllerPg) GetAll() ([]University, error) {

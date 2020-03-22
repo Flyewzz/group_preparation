@@ -1,23 +1,15 @@
 package handlers
 
-import (
-// . "github.com/Flyewzz/golang-itv/interfaces"
-)
+import "github.com/Flyewzz/group_preparation/interfaces"
 
 type HandlerData struct {
-	// Executor        Executor
-	// StoreController Store
-	// Dispatcher      Dispatcher
+	UniversityController interfaces.UniversityController
+	// SubjectController    interfaces.SubjectController
 }
 
-// func NewHandlerData(ex Executor, sc Store, d Dispatcher) *HandlerData {
-// 	return &HandlerData{
-// 		Executor:        ex,
-// 		StoreController: sc,
-// 		Dispatcher:      d,
-// 	}
-// }
-
-func NewHandlerData() *HandlerData {
-	return &HandlerData{}
+func NewHandlerData(uc interfaces.UniversityController) *HandlerData {
+	return &HandlerData{
+		UniversityController: uc,
+		// SubjectController:    sc,
+	}
 }

@@ -4,10 +4,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/Flyewzz/golang-itv/executor"
-	"github.com/Flyewzz/golang-itv/handlers"
-	"github.com/Flyewzz/golang-itv/store"
-	"github.com/Flyewzz/golang-itv/workers/dispatcher"
+	"github.com/Flyewzz/group_preparation/db"
+	"github.com/Flyewzz/group_preparation/handlers"
+	"github.com/Flyewzz/group_preparation/store/db/pg"
 	"github.com/spf13/viper"
 )
 
@@ -19,12 +18,12 @@ func PrepareConfig() {
 }
 
 func PrepareHandlerData() *handlers.HandlerData {
-	storeController := store.NewStoreController(viper.GetInt("itemsPerPage"), 0)
-	executor := executor.NewHttpExecutor()
-	countWorkers := viper.GetInt("workers.count")
-	maxTasks := viper.GetInt("tasks.max")
-	workersTimeout := viper.GetInt("workers.timeout")
-	dispatcher := dispatcher.NewDispatcher(countWorkers, maxTasks, workersTimeout, executor, storeController)
-	dispatcher.Dispatch()
-	return handlers.NewHandlerData(executor, storeController, dispatcher)
+	db, err := db.ConnectToDB(viper.GetString("db.host"),
+		viper.GetString("db.user"), viper.GetString("db.password"), viper.GetString("db.database"))
+	if err != nil {
+		log.Fatalf("Error with database: %v\n", err)
+	}
+	universityController := pg.NewUniversityControllerPg(viper.GetInt("university.itemsPerPage"), db)
+	// subjectController := pg.NewSubjectControllerPg(viper.GetInt("subject.itemsPerPage"), db)
+	return handlers.NewHandlerData(universityController)
 }
