@@ -7,6 +7,8 @@ import (
 	// "fmt"
 	// "log"
 	"net/http"
+
+	"github.com/gorilla/mux"
 	// . "github.com/Flyewzz/golang-itv/features"
 	// "github.com/Flyewzz/golang-itv/models"
 )
@@ -22,7 +24,7 @@ func (hd *HandlerData) AllUniversitiesHandler(w http.ResponseWriter, r *http.Req
 }
 
 func (hd *HandlerData) AllSubjectsHandler(w http.ResponseWriter, r *http.Request) {
-	strId := r.URL.Query().Get("id")
+	strId := mux.Vars(r)["id"]
 	id, err := strconv.Atoi(strId)
 	if err != nil {
 		http.Error(w, "Bad request", http.StatusBadRequest)

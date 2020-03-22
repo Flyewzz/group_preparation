@@ -24,8 +24,8 @@ func (uc *UniversityControllerPg) SearchByName(name int) ([]models.University, e
 }
 
 func (uc *UniversityControllerPg) GetAllSubjects(universityId int) ([]models.Subject, error) {
-	rows, err := uc.db.Query("SELECT subject_id, name, semester from subjects s" +
-		"INNER JOIN universities u ON s.university_id = u.university_id")
+	rows, err := uc.db.Query("SELECT s.subject_id, s.name, s.semester from subjects s "+
+		"INNER JOIN universities u ON s.university_id = u.university_id AND u.university_id = $1", universityId)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (uc *UniversityControllerPg) GetAllSubjects(universityId int) ([]models.Sub
 
 func (uc *UniversityControllerPg) GetSubjectsByPage(universityId, page int) ([]models.Subject, error) {
 	itemsPerPage := uc.itemsPerPage
-	rows, err := uc.db.Query("SELECT subject_id, name, semester FROM subjects s "+
+	rows, err := uc.db.Query("SELECT s.subject_id, s.name, s.semester FROM subjects s "+
 		"INNER JOIN universities u ON s.university_id = u.university_id LIMIT $1 OFFSET $2",
 		itemsPerPage, itemsPerPage*(page-1))
 	if err != nil {
