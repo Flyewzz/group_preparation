@@ -1,68 +1,54 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Group Preparation Service (GPS)
 
-## Available Scripts
+## API:
+  ### Работа с университетами
+  * **GET** /universities - получение списка всех доступных в базе университетов
+  * **GET** /universities (attributes: **name** - название университета, частично или полностью) - поиск университетов по частичному совпадению названия
+  * **GET** /universities (attributes: **page** - номер страницы) - получение **page**-ой страницы со списком университетов
+  * **GET** /university (attributes: **id** - id университета) - получение конкретного университета по id
+  * **POST** /university (attributes: **name** - название университета) - создание университета
+  * **DELETE** /university (attributes: **id** - id университета) - удаление конкретного университета
+  * **DELETE** /universities - удаление всех университетов
+  * **GET** /university/**id**/subjects (parameters: **id** - id университета) - получение списка всех предметов определенного университета
+  * **GET** /university/**id**/subjects (parameters: **id** - id университета, attributes: **page** - номер страницы) - получение **page**-ой страницы со списком предметов
+  
+### Предметы
+  * **GET** /subject (attributes: **id** - id предмета) - получение конкретного предмета по id
+  * **POST** /university/**id**/subject (parameters: **id** - id университета, attributes: **name** - название, **semester** - семестр) - добавление нового предмета
+  * **DELETE** /subject (attributes: **id** - название) - удаление предмета
+  * **GET** /university/**id**/subjects (parameters: **id** - id университета, attributes: **name** - название предмета, частично или полностью, **semester** - семестр) - поиск предмета по частичному совпадению названия, атрибуты опциональны
+  
+### Материалы
+  * --> продолжение следует...
+  
+### Комнаты
+  * **GET** /room (attribute: **id** - id или частичное/полное название комнаты) - получение доступа к комнате
+  * **POST** /events/**event_id**/rooms (parameters: **event_id** - id мероприятия, attribute: **name** - полное название комнаты) - создание комнаты
+  * **PUT** /events/**event_id**/rooms (parameters: **event_id** - id мероприятия, attribute: **id** - id комнаты, **name** - новое название для комнаты) - изменение названия комнаты
+  * **DELETE** /events/**event_id**/rooms (parameters: **event_id** - id мероприятия, attribute: **id** - id комнаты) - удаление комнаты
+  
+  * **POST** /rooms/message (attributes: **text** - текст сообщения, **attachments** - файлы-вложения) - отправка сообщения в мероприятие
+  * **GET** /rooms/messages (attributes: **id** - id или название мероприятия) - получение списка всех сообщений в мероприятии
+  
+### Тесты
+  * **GET** /events/**event_id**/tests (parameters: **event_id** - id мероприятия) - получение всех тестов для данного мероприятия
+  * **GET** /events/**event_id**/test (parameters: **event_id** - id мероприятия, attributes: **id** - id или название теста) - получение конкретного теста
+  * **POST** /events/**event_id**/test (parameters: **event_id** - id мероприятия, attributes: **name** - название теста) - создание теста
+  
+### Вопросы
+  * **GET** /tests/**test_id**/questions (parameters: **event_id** - id мероприятия) - получение всех вопросов данного теста
+  * **GET** /question (attributes: **id** - id или название теста) - получение конкретного вопроса
+  
+  * **POST** /tests/**test_id**/question (parameters: **test_id** - id теста, attributes: **name** - название вопроса) - создание вопроса
+  
+  * **POST** /questions/**question_id**/right (parameters: **question_id** - id вопроса, attributes: **answers** - id правильных вариантов ответа) - установка правильных вариантов ответа на вопрос
+  
+ ### Ответы
+  * **GET** /questions/**question_id**/answers (parameters: **question_id** - id вопроса) - получение всех тестов для данного мероприятия
+  * **GET** /events/**event_id**/test (parameters: **event_id** - id мероприятия, attributes: **id** - id или название теста) - получение конкретного теста
+  * **POST** /events/**event_id**/test (parameters: **event_id** - id мероприятия, attributes: **name** - название теста) - создание теста
 
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+### Авторизация и регистрация
+  * /login (attributes: **email**, **password**) - вход 
+  * /logout - выход
+  * /signup (attributes: **email**, **password**, **university**) - регистрация 
