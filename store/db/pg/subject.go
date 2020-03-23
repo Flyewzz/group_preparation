@@ -51,7 +51,8 @@ func (sc *SubjectControllerPg) GetById(id int) (*Subject, error) {
 
 func (sc *SubjectControllerPg) Add(universityId int, name, semester string) (int, error) {
 	var idSubject int
-	err := sc.db.QueryRow("INSERT INTO subjects (university_id, name, semester) VALUES ($1, $2, $3) RETURNING subject_id", name).Scan(&idSubject)
+	err := sc.db.QueryRow("INSERT INTO subjects (university_id, name, semester) VALUES ($1, $2, $3) RETURNING subject_id",
+		universityId, name, semester).Scan(&idSubject)
 	if err != nil {
 		return 0, err
 	}

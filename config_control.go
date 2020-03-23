@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"os"
 
 	"github.com/Flyewzz/group_preparation/db"
 	"github.com/Flyewzz/group_preparation/handlers"
@@ -11,7 +10,8 @@ import (
 )
 
 func PrepareConfig() {
-	viper.SetConfigFile(os.Args[1])
+	// viper.SetConfigFile(os.Args[1])
+	viper.SetConfigFile("config.yml")
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Cannot read a config file: %v\n", err)
 	}

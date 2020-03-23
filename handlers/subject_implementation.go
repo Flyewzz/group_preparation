@@ -1,13 +1,12 @@
 package handlers
 
 import (
-	// "fmt"
 	// "log"
 	"fmt"
 	"net/http"
 	"strconv"
-	// . "github.com/Flyewzz/golang-itv/features"
-	// "github.com/Flyewzz/golang-itv/models"
+
+	"github.com/gorilla/mux"
 )
 
 func (hd *HandlerData) AddSubjectHandler(w http.ResponseWriter, r *http.Request) {
@@ -16,13 +15,15 @@ func (hd *HandlerData) AddSubjectHandler(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
-	universityId, err := strconv.Atoi(r.FormValue("university_id"))
+	strId := mux.Vars(r)["id"]
+	universityId, err := strconv.Atoi(strId)
 	if err != nil {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
-	name := r.FormValue("name")
-	semester := r.FormValue("semester")
+	params := r.PostFormValue
+	name := params("name")
+	semester := params("semester")
 	addedId, err := hd.SubjectController.Add(universityId, name, semester)
 	if err != nil {
 		http.Error(w, "Server Internal Error", http.StatusInternalServerError)

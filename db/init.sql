@@ -98,4 +98,8 @@ create table materials
 alter table materials
   owner to postgres;
 
+create unique index subjects_subject_id_uindex
+	on subjects (name, semester);
+
+
 
