@@ -1,7 +1,7 @@
 # Group Preparation Service (GPS)
 
 ## API:
-  ### Работа с университетами
+  ### Университеты
   * **GET** /universities - получение списка всех доступных в базе университетов
   * **GET** /universities (attributes: **name** - название университета, частично или полностью) - поиск университетов по частичному совпадению названия
   * **GET** /universities (attributes: **page** - номер страницы) - получение **page**-ой страницы со списком университетов
@@ -16,6 +16,7 @@
   * **GET** /subject (attributes: **id** - id предмета) - получение конкретного предмета по id
   * **POST** /university/**id**/subject (parameters: **id** - id университета, attributes: **name** - название, **semester** - семестр) - добавление нового предмета
   * **DELETE** /subject (attributes: **id** - название) - удаление предмета
+  * **DELETE** /university/**id**/subjects (parameters: **id** - id университета) - удаление всех предметов определенного университета
   * **GET** /university/**id**/subjects (parameters: **id** - id университета, attributes: **name** - название предмета, частично или полностью, **semester** - семестр) - поиск предмета по частичному совпадению названия, атрибуты опциональны
   
 ### Материалы
