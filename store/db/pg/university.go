@@ -19,10 +19,6 @@ func NewUniversityControllerPg(itemsPerPage int, db *sql.DB) *UniversityControll
 	}
 }
 
-func (uc *UniversityControllerPg) SearchByName(name int) ([]models.University, error) {
-	return nil, nil
-}
-
 func (uc *UniversityControllerPg) GetAllSubjects(universityId int) ([]models.Subject, error) {
 	rows, err := uc.db.Query("SELECT s.subject_id, s.name, s.semester from subjects s "+
 		"INNER JOIN universities u ON s.university_id = u.university_id AND u.university_id = $1", universityId)
@@ -124,4 +120,24 @@ func (uc *UniversityControllerPg) RemoveAll() error {
 	// #! Removed all the subjects too. Warning!
 	_, err := uc.db.Exec("TRUNCATE TABLE universities CASCADE")
 	return err
+}
+
+func (uc *UniversityControllerPg) SearchByName(name string) ([]models.University, error) {
+	rows, err := uc.db.Query("SELECT university_id, name FROM universities "+
+		"WHERE LOWER(name) LIKE '%' || $1 || '%' "+
+		"ORDER BY name ASC", name)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var universities []models.University
+	for rows.Next() {
+		var u models.University
+		err = rows.Scan(&u.Id, &u.Name)
+		if err != nil {
+			continue
+		}
+		universities = append(universities, u)
+	}
+	return universities, nil
 }

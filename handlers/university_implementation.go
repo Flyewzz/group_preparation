@@ -21,6 +21,22 @@ func (hd *HandlerData) AllUniversitiesHandler(w http.ResponseWriter, r *http.Req
 	w.Write(data)
 }
 
+func (hd *HandlerData) UniversityByIdGetHandler(w http.ResponseWriter, r *http.Request) {
+	strId := r.URL.Query().Get("id")
+	id, err := strconv.Atoi(strId)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	university, err := hd.UniversityController.GetById(id)
+	if err != nil {
+		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		return
+	}
+	data, _ := json.Marshal(university)
+	w.Write(data)
+}
+
 func (hd *HandlerData) AllSubjectsHandler(w http.ResponseWriter, r *http.Request) {
 	strId := mux.Vars(r)["id"]
 	id, err := strconv.Atoi(strId)
@@ -78,4 +94,21 @@ func (hd *HandlerData) AddUniversityHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	w.Write([]byte(fmt.Sprintf("Added with id %d\n", addedId)))
+}
+
+func (hd *HandlerData) UniversitiesSearchHandler(w http.ResponseWriter, r *http.Request) {
+	name := r.URL.Query().Get("name")
+	if len(name) == 0 {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	universities, err := hd.UniversityController.SearchByName(name)
+	if err != nil {
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+	}
+	data, _ := json.Marshal(universities)
+	w.Write(data)
 }

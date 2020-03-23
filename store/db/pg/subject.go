@@ -3,6 +3,7 @@ package pg
 import (
 	"database/sql"
 
+	"github.com/Flyewzz/group_preparation/models"
 	. "github.com/Flyewzz/group_preparation/models"
 )
 
@@ -68,4 +69,44 @@ func (sc *SubjectControllerPg) RemoveAll(universityId int) error {
 	// #! Removed all the materials too. Warning!
 	_, err := sc.db.Exec("DELETE FROM subjects WHERE university_id = $1", universityId)
 	return err
+}
+
+func (sc *SubjectControllerPg) SearchByNameAndSemester(universityId int, name, semester string) ([]models.Subject, error) {
+	rows, err := sc.db.Query("SELECT subject_id, name, semester FROM subjects "+
+		"WHERE LOWER(name) LIKE '%' || $1 || '%' AND semester = $2 AND university_id = $3"+
+		"ORDER BY name ASC", name, semester, universityId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var subjects []models.Subject
+	for rows.Next() {
+		var subject models.Subject
+		err = rows.Scan(&subject.Id, &subject.Name, &subject.Semester)
+		if err != nil {
+			continue
+		}
+		subjects = append(subjects, subject)
+	}
+	return subjects, nil
+}
+
+func (sc *SubjectControllerPg) SearchByName(universityId int, name string) ([]models.Subject, error) {
+	rows, err := sc.db.Query("SELECT subject_id, name, semester FROM subjects "+
+		"WHERE LOWER(name) LIKE '%' || $1 || '%' AND university_id = $2"+
+		"ORDER BY name ASC", name, universityId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var subjects []models.Subject
+	for rows.Next() {
+		var subject models.Subject
+		err = rows.Scan(&subject.Id, &subject.Name, &subject.Semester)
+		if err != nil {
+			continue
+		}
+		subjects = append(subjects, subject)
+	}
+	return subjects, nil
 }
