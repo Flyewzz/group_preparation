@@ -6,8 +6,7 @@ import (
 
 func ConfigureHandlers(r *mux.Router, hd *HandlerData) {
 	// University
-	r.HandleFunc("/universities", hd.AllUniversitiesHandler).Methods("GET")
-	r.HandleFunc("/universities", hd.UniversitiesSearchHandler).Methods("GET")
+	r.HandleFunc("/universities", hd.UniversitiesHandler).Methods("GET")
 	r.HandleFunc("/university", hd.UniversityByIdGetHandler).Methods("GET")
 	r.HandleFunc("/university", hd.AddUniversityHandler).Methods("POST")
 	r.HandleFunc("/university", hd.UniversityByIdRemoveHandler).Methods("DELETE")
@@ -15,10 +14,9 @@ func ConfigureHandlers(r *mux.Router, hd *HandlerData) {
 
 	// Subject
 	r.HandleFunc("/university/{id}/subject", hd.AddSubjectHandler).Methods("POST")
-	r.HandleFunc("/university/{id}/subjects", hd.AllSubjectsHandler).Methods("GET")
+	r.HandleFunc("/university/{id}/subjects", hd.SubjectsHandler).Methods("GET")
 	r.HandleFunc("/subject", hd.SubjectByIdGetHandler).Methods("DELETE")
 	r.HandleFunc("/university/{id}/subjects", hd.AllSubjectsRemoveHandler).Methods("DELETE")
-	r.HandleFunc("/university/{id}/subjects", hd.SubjectsSearchHandler).Methods("GET")
 
 	// Material
 }

@@ -8,9 +8,60 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Flyewzz/group_preparation/features"
 	"github.com/Flyewzz/group_preparation/models"
 	"github.com/gorilla/mux"
 )
+
+func (hd *HandlerData) SubjectsHandler(w http.ResponseWriter, r *http.Request) {
+	var err error
+	strId := mux.Vars(r)["id"]
+	universityId, err := strconv.Atoi(strId)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	var page int = 0
+	strPage := r.URL.Query().Get("page")
+	if strPage != "" {
+		page, err = strconv.Atoi(strPage)
+		if err != nil {
+			http.Error(w, "Bad request", http.StatusBadRequest)
+			return
+		}
+	}
+	name := r.URL.Query().Get("name")
+	semester := r.URL.Query().Get("semester")
+	var subjects []models.Subject
+	if len(name) == 0 && len(semester) == 0 {
+		subjects, err = hd.SubjectController.GetAllSubjects(universityId, page)
+		return
+	} else {
+		subjects, err = hd.SubjectController.Search(universityId, name, semester, page)
+	}
+
+	if err != nil {
+		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		return
+	}
+	pagesCount := features.CalculatePageCount(len(subjects),
+		hd.SubjectController.GetItemsPerPageCount())
+	subjectsEncoded, err := json.Marshal(subjects)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	pagesData := features.PaginatorData{
+		Pages:   pagesCount,
+		Payload: subjectsEncoded,
+	}
+	data, err := json.Marshal(pagesData)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	w.Write(data)
+}
 
 func (hd *HandlerData) AddSubjectHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
@@ -61,6 +112,10 @@ func (hd *HandlerData) SubjectByIdGetHandler(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
+	if id < 1 {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
 	subject, err := hd.SubjectController.GetById(id)
 	if err != nil {
 		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
@@ -83,33 +138,4 @@ func (hd *HandlerData) AllSubjectsRemoveHandler(w http.ResponseWriter, r *http.R
 		return
 	}
 	w.Write([]byte(fmt.Sprintf("All subjects was deleted for the university with id %d\n", id)))
-}
-
-func (hd *HandlerData) SubjectsSearchHandler(w http.ResponseWriter, r *http.Request) {
-	strId := mux.Vars(r)["id"]
-	universityId, err := strconv.Atoi(strId)
-	if err != nil {
-		http.Error(w, "Bad request", http.StatusBadRequest)
-		return
-	}
-	name := r.URL.Query().Get("name")
-	if len(name) == 0 {
-		http.Error(w, "Bad request", http.StatusBadRequest)
-		return
-	}
-	semester := r.URL.Query().Get("semester")
-	var subjects []models.Subject
-	if semester == "" {
-		subjects, err = hd.SubjectController.SearchByName(universityId, name)
-	} else {
-		subjects, err = hd.SubjectController.SearchByNameAndSemester(universityId, name, semester)
-	}
-	if err != nil {
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-	}
-	data, _ := json.Marshal(subjects)
-	w.Write(data)
 }

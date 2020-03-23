@@ -20,11 +20,20 @@ func NewSubjectControllerPg(itemsPerPage int, db *sql.DB) *SubjectControllerPg {
 	}
 }
 
-func (sc *SubjectControllerPg) GetByPage(universityId, page int) ([]Subject, error) {
+func (sc *SubjectControllerPg) GetAllSubjects(universityId, page int) ([]Subject, error) {
 	itemsPerPage := sc.itemsPerPage
-	rows, err := sc.db.Query("SELECT subject_id, university_id, name, semester FROM subjects "+
-		"LIMIT $1 OFFSET $2",
-		itemsPerPage, itemsPerPage*(page-1))
+	var rows *sql.Rows
+	var err error
+	if page > 0 {
+		rows, err = sc.db.Query("SELECT subject_id, university_id, name, semester FROM subjects "+
+			"LIMIT $1 OFFSET $2",
+			itemsPerPage, (page-1)*itemsPerPage)
+	} else if page == 0 {
+		// All objects
+		rows, err = sc.db.Query("SELECT subject_id, university_id, name, semester FROM subjects")
+	} else {
+		return nil, errors.New("Incorrect page number")
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -72,21 +81,54 @@ func (sc *SubjectControllerPg) RemoveAll(universityId int) error {
 	return err
 }
 
-func (sc *SubjectControllerPg) SearchByNameAndSemester(universityId int, name, semester string, page int) ([]models.Subject, error) {
+func (sc *SubjectControllerPg) Search(universityId int, name, semester string, page int) ([]models.Subject, error) {
 	var rows *sql.Rows
 	var err error
-	if page > 0 {
-		rows, err = sc.db.Query("SELECT subject_id, name, semester FROM subjects "+
-			"WHERE LOWER(name) LIKE '%' || $1 || '%' AND semester = $2 AND university_id = $3"+
-			"ORDER BY name ASC LIMIT $4 OFFSET $5",
-			name, semester, universityId, sc.itemsPerPage, (page-1)*sc.itemsPerPage)
-	} else if page == 0 {
-		// All objects
-		rows, err = sc.db.Query("SELECT subject_id, name, semester FROM subjects "+
-			"WHERE LOWER(name) LIKE '%' || $1 || '%' AND semester = $2 AND university_id = $3"+
-			"ORDER BY name ASC ", name, semester, universityId)
+	if semester != "" && name != "" {
+		// Search by name and semester
+		if page > 0 {
+			rows, err = sc.db.Query("SELECT subject_id, name, semester FROM subjects "+
+				"WHERE LOWER(name) LIKE '%' || $1 || '%' AND semester = $2 AND university_id = $3 "+
+				"ORDER BY name ASC LIMIT $4 OFFSET $5",
+				name, semester, universityId, sc.itemsPerPage, (page-1)*sc.itemsPerPage)
+		} else if page == 0 {
+			// All objects
+			rows, err = sc.db.Query("SELECT subject_id, name, semester FROM subjects "+
+				"WHERE LOWER(name) LIKE '%' || $1 || '%' AND semester = $2 AND university_id = $3 "+
+				"ORDER BY name ASC", name, semester, universityId)
+		} else {
+			return nil, errors.New("Incorrect page number")
+		}
+	} else if semester == "" {
+		// Search only by name
+		if page > 0 {
+			rows, err = sc.db.Query("SELECT subject_id, name, semester FROM subjects "+
+				"WHERE LOWER(name) LIKE '%' || $1 || '%' AND university_id = $2 "+
+				"ORDER BY name ASC LIMIT $3 OFFSET $4", name, universityId, sc.itemsPerPage, (page-1)*sc.itemsPerPage)
+		} else if page == 0 {
+			// All objects
+			rows, err = sc.db.Query("SELECT subject_id, name, semester FROM subjects "+
+				"WHERE LOWER(name) LIKE '%' || $1 || '%' AND university_id = $2 "+
+				"ORDER BY name ASC", name, universityId)
+		} else {
+			return nil, errors.New("Incorrect page number")
+		}
+	} else if name == "" {
+		// Search only by semester
+		if page > 0 {
+			rows, err = sc.db.Query("SELECT subject_id, name, semester FROM subjects "+
+				"WHERE semester = $1 AND university_id = $2 "+
+				"ORDER BY name ASC LIMIT $3 OFFSET $4", semester, universityId, sc.itemsPerPage, (page-1)*sc.itemsPerPage)
+		} else if page == 0 {
+			// All objects
+			rows, err = sc.db.Query("SELECT subject_id, name, semester FROM subjects "+
+				"WHERE semester = $1 AND university_id = $2 "+
+				"ORDER BY name ASC", semester, universityId)
+		} else {
+			return nil, errors.New("Incorrect page number")
+		}
 	} else {
-		return nil, errors.New("Incorrect page number")
+		return nil, errors.New("Incorrect data")
 	}
 	defer rows.Close()
 	var subjects []models.Subject
@@ -101,30 +143,6 @@ func (sc *SubjectControllerPg) SearchByNameAndSemester(universityId int, name, s
 	return subjects, nil
 }
 
-func (sc *SubjectControllerPg) SearchByName(universityId int, name string, page int) ([]models.Subject, error) {
-	var rows *sql.Rows
-	var err error
-	if page > 0 {
-		rows, err = sc.db.Query("SELECT subject_id, name, semester FROM subjects "+
-			"WHERE LOWER(name) LIKE '%' || $1 || '%' AND university_id = $2"+
-			"ORDER BY name ASC LIMIT $3 OFFSET $4", name, universityId, sc.itemsPerPage, (page-1)*sc.itemsPerPage)
-	} else if page == 0 {
-		// All objects
-		rows, err = sc.db.Query("SELECT subject_id, name, semester FROM subjects "+
-			"WHERE LOWER(name) LIKE '%' || $1 || '%' AND university_id = $2"+
-			"ORDER BY name ASC", name, universityId)
-	} else {
-		return nil, errors.New("Incorrect page number")
-	}
-	defer rows.Close()
-	var subjects []models.Subject
-	for rows.Next() {
-		var subject models.Subject
-		err = rows.Scan(&subject.Id, &subject.Name, &subject.Semester)
-		if err != nil {
-			continue
-		}
-		subjects = append(subjects, subject)
-	}
-	return subjects, nil
+func (sc SubjectControllerPg) GetItemsPerPageCount() int {
+	return sc.itemsPerPage
 }

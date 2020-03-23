@@ -8,16 +8,52 @@ import (
 	// "log"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/Flyewzz/group_preparation/errs"
+	"github.com/Flyewzz/group_preparation/features"
+	"github.com/Flyewzz/group_preparation/models"
 )
 
-func (hd *HandlerData) AllUniversitiesHandler(w http.ResponseWriter, r *http.Request) {
-	universities, err := hd.UniversityController.GetAll()
+func (hd *HandlerData) UniversitiesHandler(w http.ResponseWriter, r *http.Request) {
+	var page int = 0
+	var err error
+	strPage := r.URL.Query().Get("page")
+	if strPage != "" {
+		page, err = strconv.Atoi(strPage)
+		if err != nil {
+			http.Error(w, "Bad request", http.StatusBadRequest)
+			return
+		}
+	}
+	name := r.URL.Query().Get("name")
+	var universities []models.University
+	/* If name is empty, then give all universities.
+	 * Search universities by name otherwise
+	 */
+	if name == "" {
+		universities, err = hd.UniversityController.Search(name, page)
+	} else {
+		universities, err = hd.UniversityController.GetAll(page)
+	}
 	if err != nil {
 		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
 		return
 	}
-	data, _ := json.Marshal(universities)
+	pagesCount := features.CalculatePageCount(len(universities),
+		hd.SubjectController.GetItemsPerPageCount())
+	universitiesEncoded, err := json.Marshal(universities)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	pagesData := features.PaginatorData{
+		Pages:   pagesCount,
+		Payload: universitiesEncoded,
+	}
+	data, err := json.Marshal(pagesData)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 	w.Write(data)
 }
 
@@ -37,22 +73,6 @@ func (hd *HandlerData) UniversityByIdGetHandler(w http.ResponseWriter, r *http.R
 	w.Write(data)
 }
 
-func (hd *HandlerData) AllSubjectsHandler(w http.ResponseWriter, r *http.Request) {
-	strId := mux.Vars(r)["id"]
-	id, err := strconv.Atoi(strId)
-	if err != nil {
-		http.Error(w, "Bad request", http.StatusBadRequest)
-		return
-	}
-	subjects, err := hd.UniversityController.GetAllSubjects(id)
-	if err != nil {
-		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
-		return
-	}
-	data, _ := json.Marshal(subjects)
-	w.Write(data)
-}
-
 func (hd *HandlerData) AllUniversitiesRemoveHandler(w http.ResponseWriter, r *http.Request) {
 	err := hd.UniversityController.RemoveAll()
 	if err != nil {
@@ -63,22 +83,26 @@ func (hd *HandlerData) AllUniversitiesRemoveHandler(w http.ResponseWriter, r *ht
 }
 
 func (hd *HandlerData) UniversityByIdRemoveHandler(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
-		return
-	}
-	strId := r.PostFormValue("id")
+	strId := r.URL.Query().Get("id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
-	err = hd.UniversityController.RemoveById(id)
-	if err != nil {
-		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+	if id < 1 {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
+	err = hd.UniversityController.RemoveById(id)
+	if err != nil {
+		if err == errs.UniversityDoesntExist {
+			http.Error(w, "Not found", http.StatusNotFound)
+		} else {
+			http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		}
+		return
+	}
+	w.Write([]byte(fmt.Sprintf("A university with id %d was deleted\n", id)))
 }
 
 func (hd *HandlerData) AddUniversityHandler(w http.ResponseWriter, r *http.Request) {
@@ -94,21 +118,4 @@ func (hd *HandlerData) AddUniversityHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	w.Write([]byte(fmt.Sprintf("Added with id %d\n", addedId)))
-}
-
-func (hd *HandlerData) UniversitiesSearchHandler(w http.ResponseWriter, r *http.Request) {
-	name := r.URL.Query().Get("name")
-	if len(name) == 0 {
-		http.Error(w, "Bad request", http.StatusBadRequest)
-		return
-	}
-	universities, err := hd.UniversityController.SearchByName(name)
-	if err != nil {
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-	}
-	data, _ := json.Marshal(universities)
-	w.Write(data)
 }

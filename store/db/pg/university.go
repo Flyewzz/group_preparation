@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/Flyewzz/group_preparation/errs"
 	"github.com/Flyewzz/group_preparation/models"
 	. "github.com/Flyewzz/group_preparation/models"
 )
@@ -50,12 +51,12 @@ func (uc *UniversityControllerPg) GetAll(page int) ([]University, error) {
 
 func (uc *UniversityControllerPg) GetById(id int) (*University, error) {
 	row := uc.db.QueryRow("SELECT university_id, name FROM universities WHERE university_id = $1", id)
-	var u *University
+	var u University
 	err := row.Scan(&u.Id, &u.Name)
 	if err != nil {
 		return nil, err
 	}
-	return u, nil
+	return &u, nil
 }
 
 func (uc *UniversityControllerPg) Add(name string) (int, error) {
@@ -68,7 +69,17 @@ func (uc *UniversityControllerPg) Add(name string) (int, error) {
 }
 
 func (uc *UniversityControllerPg) RemoveById(id int) error {
-	_, err := uc.db.Exec("DELETE FROM universities WHERE university_id = $1", id)
+	result, err := uc.db.Exec("DELETE FROM universities WHERE university_id = $1", id)
+	if err != nil {
+		return err
+	}
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affected == 0 {
+		return errs.UniversityDoesntExist
+	}
 	return err
 }
 
@@ -78,7 +89,7 @@ func (uc *UniversityControllerPg) RemoveAll() error {
 	return err
 }
 
-func (uc *UniversityControllerPg) SearchByName(name string, page int) ([]models.University, error) {
+func (uc *UniversityControllerPg) Search(name string, page int) ([]models.University, error) {
 	var rows *sql.Rows
 	var err error
 	if page > 0 {
@@ -105,4 +116,8 @@ func (uc *UniversityControllerPg) SearchByName(name string, page int) ([]models.
 		universities = append(universities, u)
 	}
 	return universities, nil
+}
+
+func (uc UniversityControllerPg) GetItemsPerPageCount() int {
+	return uc.itemsPerPage
 }
