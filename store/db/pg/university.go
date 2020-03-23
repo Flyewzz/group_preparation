@@ -2,6 +2,7 @@ package pg
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/Flyewzz/group_preparation/models"
 	. "github.com/Flyewzz/group_preparation/models"
@@ -19,48 +20,20 @@ func NewUniversityControllerPg(itemsPerPage int, db *sql.DB) *UniversityControll
 	}
 }
 
-func (uc *UniversityControllerPg) GetAllSubjects(universityId int) ([]models.Subject, error) {
-	rows, err := uc.db.Query("SELECT s.subject_id, s.name, s.semester from subjects s "+
-		"INNER JOIN universities u ON s.university_id = u.university_id AND u.university_id = $1", universityId)
-	if err != nil {
-		return nil, err
+func (uc *UniversityControllerPg) GetAll(page int) ([]University, error) {
+	var rows *sql.Rows
+	var err error
+	if page > 0 {
+		rows, err = uc.db.Query("SELECT university_id, name FROM universities "+
+			"ORDER BY ASC "+
+			"LIMIT $1 OFFSET $2",
+			uc.itemsPerPage, (page-1)*uc.itemsPerPage)
+	} else if page == 0 {
+		// All objects
+		rows, err = uc.db.Query("SELECT university_id, name FROM universities ORDER BY name ASC")
+	} else {
+		return nil, errors.New("Incorrect page number")
 	}
-	var subjects []models.Subject
-	defer rows.Close()
-	for rows.Next() {
-		var subject models.Subject
-		err = rows.Scan(&subject.Id, &subject.Name, &subject.Semester)
-		if err != nil {
-			continue
-		}
-		subjects = append(subjects, subject)
-	}
-	return subjects, nil
-}
-
-func (uc *UniversityControllerPg) GetSubjectsByPage(universityId, page int) ([]models.Subject, error) {
-	itemsPerPage := uc.itemsPerPage
-	rows, err := uc.db.Query("SELECT s.subject_id, s.name, s.semester FROM subjects s "+
-		"INNER JOIN universities u ON s.university_id = u.university_id LIMIT $1 OFFSET $2",
-		itemsPerPage, itemsPerPage*(page-1))
-	if err != nil {
-		return nil, err
-	}
-	var subjects []models.Subject
-	defer rows.Close()
-	for rows.Next() {
-		var subject models.Subject
-		err = rows.Scan(&subject.Id, &subject.Name, &subject.Semester)
-		if err != nil {
-			continue
-		}
-		subjects = append(subjects, subject)
-	}
-	return subjects, nil
-}
-
-func (uc *UniversityControllerPg) GetAll() ([]University, error) {
-	rows, err := uc.db.Query("SELECT university_id, name FROM universities")
 	var universities []University
 	if err != nil {
 		// 'universities' is an empty struct
@@ -72,23 +45,6 @@ func (uc *UniversityControllerPg) GetAll() ([]University, error) {
 		rows.Scan(&u.Id, &u.Name)
 		universities = append(universities, u)
 	}
-	return universities, nil
-}
-
-func (uc *UniversityControllerPg) GetByPage(page int) ([]University, error) {
-	itemsPerPage := uc.itemsPerPage
-	rows, err := uc.db.Query("SELECT university_id, name FROM universities LIMIT $1 OFFSET $2",
-		itemsPerPage, itemsPerPage*(page-1))
-	if err != nil {
-		return nil, err
-	}
-	var universities []University
-	for rows.Next() {
-		var u University
-		rows.Scan(&u.Id, &u.Name)
-		universities = append(universities, u)
-	}
-
 	return universities, nil
 }
 
@@ -122,12 +78,21 @@ func (uc *UniversityControllerPg) RemoveAll() error {
 	return err
 }
 
-func (uc *UniversityControllerPg) SearchByName(name string) ([]models.University, error) {
-	rows, err := uc.db.Query("SELECT university_id, name FROM universities "+
-		"WHERE LOWER(name) LIKE '%' || $1 || '%' "+
-		"ORDER BY name ASC", name)
-	if err != nil {
-		return nil, err
+func (uc *UniversityControllerPg) SearchByName(name string, page int) ([]models.University, error) {
+	var rows *sql.Rows
+	var err error
+	if page > 0 {
+		rows, err = uc.db.Query("SELECT university_id, name FROM universities "+
+			"WHERE LOWER(name) LIKE '%' || $1 || '%' "+
+			"ORDER BY name ASC LIMIT $2 OFFSET $3",
+			name, uc.itemsPerPage, (page-1)*uc.itemsPerPage)
+	} else if page == 0 {
+		// All objects
+		rows, err = uc.db.Query("SELECT university_id, name FROM universities "+
+			"WHERE LOWER(name) LIKE '%' || $1 || '%' "+
+			"ORDER BY name ASC", name)
+	} else {
+		return nil, errors.New("Incorrect page number")
 	}
 	defer rows.Close()
 	var universities []models.University

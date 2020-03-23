@@ -6,10 +6,9 @@ import (
 
 type UniversityController interface {
 	Add(name string) (int, error)
-	GetAll() ([]models.University, error)
-	GetByPage(page int) ([]models.University, error)
+	GetAll(page int) ([]models.University, error)
 	GetById(id int) (*models.University, error)
-	SearchByName(name string) ([]models.University, error)
+	SearchByName(name string, page int) ([]models.University, error)
 	RemoveById(id int) error
 	RemoveAll() error
 	GetAllSubjects(universityId int) ([]models.Subject, error)
