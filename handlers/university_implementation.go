@@ -30,9 +30,9 @@ func (hd *HandlerData) UniversitiesHandler(w http.ResponseWriter, r *http.Reques
 	 * Search universities by name otherwise
 	 */
 	if name == "" {
-		universities, err = hd.UniversityController.Search(name, page)
-	} else {
 		universities, err = hd.UniversityController.GetAll(page)
+	} else {
+		universities, err = hd.UniversityController.Search(name, page)
 	}
 	if err != nil {
 		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
