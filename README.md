@@ -1,7 +1,7 @@
 # Group Preparation Service (GPS)
 
 ## API:
-  ### Университеты
+  ### Работа с университетами
   * **GET** /universities - получение списка всех доступных в базе университетов
   * **GET** /universities (attributes: **name** - название университета, частично или полностью) - поиск университетов по частичному совпадению названия
   * **GET** /universities (attributes: **page** - номер страницы) - получение **page**-ой страницы со списком университетов
@@ -14,13 +14,17 @@
   
 ### Предметы
   * **GET** /subject (attributes: **id** - id предмета) - получение конкретного предмета по id
-  * **POST** /university/**id**/subject (parameters: **id** - id университета, attributes: **name** - название, **semester** - семестр) - добавление нового предмета
-  * **DELETE** /subject (attributes: **id** - название) - удаление предмета
+  * **POST** /university/**id**/subject (parameters: **id** - id университета, attributes: **name** - название предмета, **semester** - семестр) - добавление нового предмета
+  * **DELETE** /subject (attributes: **id** - id предмета) - удаление предмета
   * **DELETE** /university/**id**/subjects (parameters: **id** - id университета) - удаление всех предметов определенного университета
-  * **GET** /university/**id**/subjects (parameters: **id** - id университета, attributes: **name** - название предмета, частично или полностью, **semester** - семестр) - поиск предмета по частичному совпадению названия, атрибуты опциональны
+  * **GET** /university/**id**/subjects (parameters: **id** - id университета, attributes: **name** - название предмета, частично или полностью, **semester** - семестр) - поиск предмета по частичному совпадению названия, атрибут "семестр" опционален - в таком случае ищется предмет независимо от семестра (только по названию)
   
 ### Материалы
-  * --> продолжение следует...
+  * **GET** /material (attributes: **id** - id материала) - получение конкретного материала по id
+  * **POST** /subject/**subject_id**/material (parameters: **subject_id** - id предмета, attributes: **name** - название материала, **type_id** - id типа работы) - добавление нового материала
+  * **DELETE** /material (attributes: **id** - id материала) - удаление материала
+  * **DELETE** /subject/**id**/materials (parameters: **id** - id предмета) - удаление всех материалов определенного предмета
+  * **GET** /subject/**id**/materials (parameters: **id** - id предмета, attributes: **name** - название материала, частично или полностью) - поиск предмета по частичному совпадению названия
   
 ### Комнаты
   * **GET** /room (attribute: **id** - id или частичное/полное название комнаты) - получение доступа к комнате
