@@ -24,6 +24,6 @@ func PrepareHandlerData() *handlers.HandlerData {
 		log.Fatalf("Error with database: %v\n", err)
 	}
 	universityController := pg.NewUniversityControllerPg(viper.GetInt("university.itemsPerPage"), db)
-	// subjectController := pg.NewSubjectControllerPg(viper.GetInt("subject.itemsPerPage"), db)
-	return handlers.NewHandlerData(universityController)
+	subjectController := pg.NewSubjectControllerPg(viper.GetInt("subject.itemsPerPage"), db)
+	return handlers.NewHandlerData(universityController, subjectController)
 }

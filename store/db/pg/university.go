@@ -116,12 +116,12 @@ func (uc *UniversityControllerPg) Add(name string) (int, error) {
 }
 
 func (uc *UniversityControllerPg) RemoveById(id int) error {
-	_, err := uc.db.Exec("DELETE FROM univerisities WHERE university_id = $1", id)
+	_, err := uc.db.Exec("DELETE FROM universities WHERE university_id = $1", id)
 	return err
 }
 
 func (uc *UniversityControllerPg) RemoveAll() error {
-	// #! Removed all the subjects too. Be careful!
+	// #! Removed all the subjects too. Warning!
 	_, err := uc.db.Exec("TRUNCATE TABLE universities CASCADE")
 	return err
 }

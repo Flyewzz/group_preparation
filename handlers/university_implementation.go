@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 
 	// "fmt"
@@ -46,6 +47,21 @@ func (hd *HandlerData) AllUniversitiesRemoveHandler(w http.ResponseWriter, r *ht
 		return
 	}
 	w.Write([]byte("All universities was successfully deleted."))
+}
+
+func (hd *HandlerData) AddUniversityHandler(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+	name := r.FormValue("name")
+	addedId, err := hd.UniversityController.Add(name)
+	if err != nil {
+		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		return
+	}
+	w.Write([]byte(fmt.Sprintf("Added with id %d\n", addedId)))
 }
 
 // func (hd *HandlerData) RequestHandler(w http.ResponseWriter, r *http.Request) {
