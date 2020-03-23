@@ -16,11 +16,11 @@ const useStyles = makeStyles(() => ({
     minWidth: 120,
   },
   select: {
-    padding: '10px 8px 10px 0',
+    padding: '10px 8px 10px 14px',
   },
   label: {
     transform: 'translate(14px, 12px) scale(1)'
-  }
+  },
 }));
 
 function Filter(props) {

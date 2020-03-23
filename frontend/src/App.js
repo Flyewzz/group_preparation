@@ -6,6 +6,7 @@ import LandingPage from "./pages/LandingPage";
 import Header from "./components/common/Header";
 import MainPage from "./pages/MainPage";
 import UniversityPage from "./pages/UniversityPage";
+import SubjectPage from "./pages/SubjectPage";
 
 function App() {
   return (
@@ -20,6 +21,9 @@ function App() {
         </Route>
         <Route path="/university/:id" render={(props) =>
           <UniversityPage id={props.match.params.id}/>
+        }/>
+        <Route path="/subject/:id" render={(props) =>
+          <SubjectPage id={props.match.params.id}/>
         }/>
       </Switch>
     </div>
