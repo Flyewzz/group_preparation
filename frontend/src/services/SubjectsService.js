@@ -14,6 +14,14 @@ class SubjectsService {
     const response = await fetch(request);
     return response.json();
   };
+
+  getById = async (id) => {
+    let url = config.apiUrl + 'subject?id=' + id;
+    const options = {method: 'GET'};
+    const request = new Request(url, options);
+    const response = await fetch(request);
+    return response.json();
+  }
 }
 
 export default SubjectsService;

@@ -12,6 +12,10 @@ import Box from '@material-ui/core/Box';
 import FolderRoundedIcon from '@material-ui/icons/FolderRounded';
 import GroupRoundedIcon from '@material-ui/icons/GroupRounded';
 import FormatListNumberedRoundedIcon from '@material-ui/icons/FormatListNumberedRounded';
+import SubjectsService from "../services/SubjectsService";
+import MaterialService from "../services/MaterialService";
+import {decorate, observable, runInAction} from "mobx";
+import {observer} from "mobx-react";
 
 const data = [
   {
@@ -194,16 +198,20 @@ function SubjectPage(props) {
         <TabPanel value={value} index={0}>
           <Container maxWidth="sm" className={styles.wrapper}>
             <div className={styles.name}>
-              {getSubjectName()}
+              {props.title}
             </div>
             <FilterLine/>
             <table className={styles.table}>
               <TableHeader/>
-              {data.map((value) =>
+              {props.data.map((value) =>
                 <Material material={value}/>
               )}
             </table>
-            <Pagination count={10} shape="rounded" color="primary"/>
+            <Pagination count={props.pageCount}
+                        page={props.currPage}
+                        onChange={props.onChange}
+                        shape="rounded"
+                        color="primary"/>
           </Container>
         </TabPanel>
         <TabPanel value={value} index={1}>
@@ -221,4 +229,70 @@ function SubjectPage(props) {
   );
 }
 
-export default SubjectPage;
+class SubjectPageController extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.currPage = 1;
+    this.pageCount = 1;
+    this.subjectsService = new SubjectsService();
+    this.materialService = new MaterialService();
+  }
+
+  subject = {name: ''};
+  materials = [];
+
+  componentDidMount() {
+    const page = 1; // TODO get from url
+    this.getSubject();
+    this.getMaterials(page);
+  }
+
+  getSubject = () => {
+    const id = this.props.id;
+    this.subjectsService.getById(id).then((result) => {
+        runInAction(() => {
+          this.subject = result;
+        })
+      },
+      (error) => {
+        console.log(error)
+      })
+  };
+
+  getMaterials = (page) => {
+    const id = this.props.id;
+    this.currPage = page;
+    this.materialService.getPage(id, page).then((result) => {
+        runInAction(() => {
+          this.pageCount = result.pages;
+          this.materials = result.payload ? result.payload : [];
+        });
+      },
+      (error) => {
+        console.log(error);
+      });
+  };
+
+  onPageClick = (event, page) => {
+    this.getMaterials(page);
+  };
+
+  render() {
+    return (
+      <SubjectPage title={this.subject.name}
+                   data={this.materials}
+                   currPage={this.currPage}
+                   pageCount={this.pageCount}
+                   onChange={this.onPageClick}/>
+    )
+  }
+}
+
+decorate(SubjectPageController, {
+  pageCount: observable,
+  subject: observable,
+  materials: observable,
+});
+
+export default observer(SubjectPageController);

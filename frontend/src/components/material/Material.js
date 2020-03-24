@@ -47,34 +47,37 @@ const addSign = (rating) => {
 
 function Material(props) {
   const styles = useStyles();
-  const department = props.material.department ? props.material.department + ', ' : '';
-  const secondaryText = department + props.material.year;
+  const secondaryText = new Date(props.material.date.replace(' ', 'T')).toLocaleDateString();
 
   return (
     <TableRow className={styles.listItem}>
       <TableCell className={styles.cell}>
-        <Link component={RouterLink} to={'/material/' + props.material.id} className={styles.listItem} underline="none" color="inherit">
+        <Link component={RouterLink} to={'/material/' + props.material.id} className={styles.listItem} underline="none"
+              color="inherit">
           <ListItemText primary={props.material.name}
                         secondary={secondaryText}
                         className={styles.first}/>
         </Link>
       </TableCell>
       <TableCell align={'center'} className={styles.cell}>
-        <Link component={RouterLink} to={'/material/' + props.material.id} className={styles.listItem} underline="none" color="inherit">
+        <Link component={RouterLink} to={'/material/' + props.material.id} className={styles.listItem} underline="none"
+              color="inherit">
           <ListItemText primary={props.material.type}/>
         </Link>
       </TableCell>
       <TableCell align={'center'} className={styles.cell}>
-        <Link component={RouterLink} to={'/material/' + props.material.id} className={styles.listItem} underline="none" color="inherit">
+        <Link component={RouterLink} to={'/material/' + props.material.id} className={styles.listItem} underline="none"
+              color="inherit">
           <ListItemText className={styles.username}
-                        primary={props.material.author}/>
+                        primary={props.material.user_email}/>
         </Link>
       </TableCell>
       <TableCell align="right" className={styles.cell}>
-        <Link component={RouterLink} to={'/material/' + props.material.id} className={styles.listItem} underline="none" color="inherit">
-          <ListItemText primary={addSign(props.material.rating)}
+        <Link component={RouterLink} to={'/material/' + props.material.id} className={styles.listItem} underline="none"
+              color="inherit">
+          <ListItemText primary={addSign(0)}
                         primaryTypographyProps={
-                          {className: getRatingStyle(styles, props.material.rating)}
+                          {className: getRatingStyle(styles, 0)}
                         }/>
         </Link>
       </TableCell>
