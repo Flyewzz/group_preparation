@@ -38,17 +38,20 @@ func (hd *HandlerData) SubjectsHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
 	semester := r.URL.Query().Get("semester")
 	var subjects []models.Subject
+	var elementsCount int = 0
 	if len(name) == 0 && len(semester) == 0 {
 		subjects, err = hd.SubjectController.GetAllSubjects(universityId, page)
+		elementsCount, err = hd.UniversityController.GetElementsCount()
 	} else {
 		subjects, err = hd.SubjectController.Search(universityId, name, semester, page)
+		elementsCount = len(subjects)
 	}
 
 	if err != nil {
 		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
 		return
 	}
-	pagesCount := features.CalculatePageCount(len(subjects),
+	pagesCount := features.CalculatePageCount(elementsCount,
 		hd.SubjectController.GetItemsPerPageCount())
 	subjectsEncoded, err := json.Marshal(subjects)
 	if err != nil {

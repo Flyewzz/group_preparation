@@ -11,6 +11,6 @@ type MaterialController interface {
 	RemoveAll(subjectId int) error
 	Search(subjectId int, name string, typeId, page int) ([]models.MaterialData, error)
 	GetAllMaterials(subjectId, page int) ([]models.MaterialData, error)
-
+	GetElementsCount(subjectId int) (int, error)
 	GetItemsPerPageCount() int
 }

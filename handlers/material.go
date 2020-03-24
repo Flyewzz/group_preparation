@@ -40,17 +40,21 @@ func (hd *HandlerData) MaterialsHandler(w http.ResponseWriter, r *http.Request) 
 	name := r.URL.Query().Get("name")
 	strTypeId := r.URL.Query().Get("type_id")
 	typeId, err := strconv.Atoi(strTypeId)
+
+	var elementsCount int = 0
 	if len(name) == 0 && (typeId == 0 || err != nil) {
 		materials, err = hd.MaterialController.GetAllMaterials(subjectId, page)
+		elementsCount, err = hd.UniversityController.GetElementsCount()
 	} else {
 		materials, err = hd.MaterialController.Search(subjectId, name, typeId, page)
+		elementsCount = len(materials)
 	}
 
 	if err != nil {
 		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
 		return
 	}
-	pagesCount := features.CalculatePageCount(len(materials),
+	pagesCount := features.CalculatePageCount(elementsCount,
 		hd.MaterialController.GetItemsPerPageCount())
 	materialsEncoded, err := json.Marshal(materials)
 	if err != nil {

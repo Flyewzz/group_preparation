@@ -11,6 +11,6 @@ type UniversityController interface {
 	Search(name string, page int) ([]models.University, error)
 	RemoveById(id int) error
 	RemoveAll() error
-
+	GetElementsCount() (int, error)
 	GetItemsPerPageCount() int
 }

@@ -61,6 +61,13 @@ func (mc *MaterialControllerPg) GetAllMaterials(subjectId, page int) ([]Material
 	return materials, nil
 }
 
+func (mc *MaterialControllerPg) GetElementsCount(subjectId int) (int, error) {
+	var cnt int
+	err := mc.db.QueryRow("SELECT COUNT(*) FROM materials "+
+		"WHERE subject_id = $1", subjectId).Scan(&cnt)
+	return cnt, err
+}
+
 func (mc *MaterialControllerPg) GetById(id int) (*MaterialData, error) {
 	row := mc.db.QueryRow("SELECT m.material_id, m.name, wt.name, u.email, m.date "+
 		"FROM materials m "+

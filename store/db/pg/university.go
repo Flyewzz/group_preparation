@@ -50,6 +50,12 @@ func (uc *UniversityControllerPg) GetAll(page int) ([]University, error) {
 	return universities, nil
 }
 
+func (uc *UniversityControllerPg) GetElementsCount() (int, error) {
+	var cnt int
+	err := uc.db.QueryRow("SELECT COUNT(*) FROM universities").Scan(&cnt)
+	return cnt, err
+}
+
 func (uc *UniversityControllerPg) GetById(id int) (*University, error) {
 	row := uc.db.QueryRow("SELECT university_id, name, full_name FROM universities "+
 		"WHERE university_id = $1", id)
