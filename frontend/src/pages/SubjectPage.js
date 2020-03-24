@@ -15,6 +15,7 @@ import FormatListNumberedRoundedIcon from '@material-ui/icons/FormatListNumbered
 
 const data = [
   {
+    id: 1,
     name: 'РК №1',
     department: 'ИУ7',
     year: '2020',
@@ -23,6 +24,7 @@ const data = [
     rating: 23,
   },
   {
+    id: 2,
     name: 'ДЗ №1',
     department: 'ИУ7',
     year: '2020',
@@ -31,6 +33,7 @@ const data = [
     rating: 20,
   },
   {
+    id: 3,
     name: 'ЛР №1',
     department: 'ИУ7',
     year: '2020',
@@ -39,6 +42,7 @@ const data = [
     rating: -13,
   },
   {
+    id: 4,
     name: 'РК №2',
     year: '2020',
     type: 'РК',
@@ -46,6 +50,7 @@ const data = [
     rating: 23,
   },
   {
+    id: 5,
     name: 'ДЗ №2',
     department: 'ИУ7',
     year: '2020',
@@ -54,6 +59,7 @@ const data = [
     rating: 0,
   },
   {
+    id: 6,
     name: 'РК №1',
     department: 'ИУ7',
     year: '2020',
@@ -62,6 +68,7 @@ const data = [
     rating: 23,
   },
   {
+    id: 7,
     name: 'ДЗ №1',
     department: 'ИУ7',
     year: '2020',
@@ -70,6 +77,7 @@ const data = [
     rating: 20,
   },
   {
+    id: 8,
     name: 'ЛР №1',
     department: 'ИУ7',
     year: '2020',

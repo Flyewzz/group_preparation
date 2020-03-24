@@ -7,6 +7,7 @@ import Header from "./components/common/Header";
 import MainPage from "./pages/MainPage";
 import UniversityPage from "./pages/UniversityPage";
 import SubjectPage from "./pages/SubjectPage";
+import MaterialPage from "./pages/MaterialPage";
 
 function App() {
   return (
@@ -24,6 +25,9 @@ function App() {
         }/>
         <Route path="/subject/:id" render={(props) =>
           <SubjectPage id={props.match.params.id}/>
+        }/>
+        <Route path="/material/:id" render={(props) =>
+          <MaterialPage id={props.match.params.id}/>
         }/>
       </Switch>
     </div>
