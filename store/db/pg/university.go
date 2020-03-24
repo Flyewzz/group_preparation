@@ -2,7 +2,7 @@ package pg
 
 import (
 	"database/sql"
-	"errors"
+	"strings"
 
 	"github.com/Flyewzz/group_preparation/errs"
 	"github.com/Flyewzz/group_preparation/models"
@@ -33,7 +33,7 @@ func (uc *UniversityControllerPg) GetAll(page int) ([]University, error) {
 		// All objects
 		rows, err = uc.db.Query("SELECT university_id, name FROM universities ORDER BY name ASC")
 	} else {
-		return nil, errors.New("Incorrect page number")
+		return nil, errs.IncorrectPageNumber
 	}
 	var universities []University
 	if err != nil {
@@ -96,14 +96,14 @@ func (uc *UniversityControllerPg) Search(name string, page int) ([]models.Univer
 		rows, err = uc.db.Query("SELECT university_id, name FROM universities "+
 			"WHERE LOWER(name) LIKE '%' || $1 || '%' "+
 			"ORDER BY name ASC LIMIT $2 OFFSET $3",
-			name, uc.itemsPerPage, (page-1)*uc.itemsPerPage)
+			strings.ToLower(name), uc.itemsPerPage, (page-1)*uc.itemsPerPage)
 	} else if page == 0 {
 		// All objects
 		rows, err = uc.db.Query("SELECT university_id, name FROM universities "+
 			"WHERE LOWER(name) LIKE '%' || $1 || '%' "+
-			"ORDER BY name ASC", name)
+			"ORDER BY name ASC", strings.ToLower(name))
 	} else {
-		return nil, errors.New("Incorrect page number")
+		return nil, errs.IncorrectPageNumber
 	}
 	defer rows.Close()
 	var universities []models.University

@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Flyewzz/group_preparation/errs"
 	"github.com/Flyewzz/group_preparation/features"
 	"github.com/Flyewzz/group_preparation/models"
 	"github.com/gorilla/mux"
@@ -29,13 +30,16 @@ func (hd *HandlerData) SubjectsHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad request", http.StatusBadRequest)
 			return
 		}
+		if page < 1 {
+			http.Error(w, "Bad request", http.StatusBadRequest)
+			return
+		}
 	}
 	name := r.URL.Query().Get("name")
 	semester := r.URL.Query().Get("semester")
 	var subjects []models.Subject
 	if len(name) == 0 && len(semester) == 0 {
 		subjects, err = hd.SubjectController.GetAllSubjects(universityId, page)
-		return
 	} else {
 		subjects, err = hd.SubjectController.Search(universityId, name, semester, page)
 	}
@@ -87,22 +91,26 @@ func (hd *HandlerData) AddSubjectHandler(w http.ResponseWriter, r *http.Request)
 }
 
 func (hd *HandlerData) SubjectByIdRemoveHandler(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
-		return
-	}
-	strId := r.PostFormValue("id")
+	strId := r.URL.Query().Get("id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
-	err = hd.SubjectController.RemoveById(id)
-	if err != nil {
-		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+	if id < 1 {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
+	err = hd.SubjectController.RemoveById(id)
+	if err != nil {
+		if err == errs.SubjectDoesntExist {
+			http.Error(w, "Not found", http.StatusNotFound)
+		} else {
+			http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		}
+		return
+	}
+	w.Write([]byte(fmt.Sprintf("A subject with id %d was deleted\n", id)))
 }
 
 func (hd *HandlerData) SubjectByIdGetHandler(w http.ResponseWriter, r *http.Request) {

@@ -15,7 +15,8 @@ func ConfigureHandlers(r *mux.Router, hd *HandlerData) {
 	// Subject
 	r.HandleFunc("/university/{id}/subject", hd.AddSubjectHandler).Methods("POST")
 	r.HandleFunc("/university/{id}/subjects", hd.SubjectsHandler).Methods("GET")
-	r.HandleFunc("/subject", hd.SubjectByIdGetHandler).Methods("DELETE")
+	r.HandleFunc("/subject", hd.SubjectByIdGetHandler).Methods("GET")
+	r.HandleFunc("/subject", hd.SubjectByIdRemoveHandler).Methods("DELETE")
 	r.HandleFunc("/university/{id}/subjects", hd.AllSubjectsRemoveHandler).Methods("DELETE")
 
 	// Material

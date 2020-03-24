@@ -11,5 +11,6 @@ type SubjectController interface {
 	RemoveAll(universityId int) error
 	Search(universityId int, name, semester string, page int) ([]models.Subject, error)
 	GetAllSubjects(universityId, page int) ([]models.Subject, error)
+
 	GetItemsPerPageCount() int
 }
