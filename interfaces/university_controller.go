@@ -5,7 +5,7 @@ import (
 )
 
 type UniversityController interface {
-	Add(name string) (int, error)
+	Add(name, fullName string) (int, error)
 	GetAll(page int) ([]models.University, error)
 	GetById(id int) (*models.University, error)
 	Search(name string, page int) ([]models.University, error)
