@@ -112,7 +112,8 @@ func (hd *HandlerData) AddUniversityHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	name := r.PostFormValue("name")
-	addedId, err := hd.UniversityController.Add(name)
+	fullName := r.PostFormValue("full_name")
+	addedId, err := hd.UniversityController.Add(name, fullName)
 	if err != nil {
 		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
 		return

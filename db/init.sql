@@ -3,7 +3,8 @@ create table universities
   university_id serial       not null
     constraint universities_pk
       primary key,
-  name          varchar(150) not null
+  name          varchar(150) not null,
+  full_name     varchar(1000) not null
 );
 
 alter table universities
