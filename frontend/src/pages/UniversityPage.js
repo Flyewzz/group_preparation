@@ -1,7 +1,10 @@
 import React from "react";
+import {observable, runInAction, decorate} from "mobx"
+import {observer} from "mobx-react"
 import ListContainer from "../components/common/ListContainer"
 import Subject from "../components/subjects/Subject";
 import Filter from "../components/subjects/Filter";
+import SubjectsService from "../services/SubjectsService";
 
 const data = [
   {
@@ -66,15 +69,61 @@ const data = [
   },
 ];
 
-function UniversityPage() {
-  return (
-    <ListContainer title={'Предметы'}
-                   subheader={<Filter/>}
-                   items={data.map((value) =>
-                     <Subject subject={value}/>
-                   )}>
-    </ListContainer>
-  );
+class UniversityPage extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.pageCount = 1;
+    this.subjectsService = new SubjectsService();
+  }
+
+  subjects = [];
+
+  componentDidMount() {
+    const page = 1; // get from url
+    console.log('mounting');
+    this.getSubjects(page);
+  }
+
+  getSubjects = (page) => {
+    this.currPage = page;
+    this.subjectsService.getPage(page).then((result) => {
+        runInAction(() => {
+          // this.pageCount = result.pages;
+          // this.universities = result.payload;
+          this.pageCount = 5;
+          this.subjects = data;
+        });
+      },
+      (error) => {
+        console.log(error);
+        this.pageCount = 5;
+        this.subjects = data;
+      });
+  };
+
+  onPageClick = (event, page) => {
+    this.getSubjects(page);
+  };
+
+  render() {
+    return (
+      <ListContainer title={'Предметы'}
+                     subheader={<Filter/>}
+                     currPage={this.currPage}
+                     pageCount={this.pageCount}
+                     onChange={this.onPageClick}
+                     items={this.subjects.map((value) =>
+                       <Subject subject={value}/>
+                     )}>
+      </ListContainer>
+    );
+  }
 }
 
-export default UniversityPage;
+decorate(UniversityPage, {
+  pageCount: observable,
+  subjects: observable,
+});
+
+export default observer(UniversityPage);

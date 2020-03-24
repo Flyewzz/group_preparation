@@ -13,7 +13,6 @@ import FolderRoundedIcon from '@material-ui/icons/FolderRounded';
 import GroupRoundedIcon from '@material-ui/icons/GroupRounded';
 import FormatListNumberedRoundedIcon from '@material-ui/icons/FormatListNumberedRounded';
 
-
 const data = [
   {
     name: 'РК №1',
@@ -131,7 +130,6 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 0,
   },
 }));
-
 
 function TabPanel(props) {
   const {children, value, index, ...other} = props;

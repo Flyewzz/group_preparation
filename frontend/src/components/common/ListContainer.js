@@ -56,7 +56,11 @@ function ListContainer(props) {
       <List className={styles.list} subheader={props.subheader}>
         {formList(props.items)}
       </List>
-      <Pagination count={10} shape="rounded" color="primary"/>
+      <Pagination count={props.pageCount}
+                  page={props.currPage}
+                  onChange={props.onChange}
+                  shape="rounded"
+                  color="primary"/>
     </Container>
   );
 }
