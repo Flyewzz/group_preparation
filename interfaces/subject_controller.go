@@ -9,7 +9,8 @@ type SubjectController interface {
 	Add(universityId int, name, semester string) (int, error)
 	RemoveById(id int) error
 	RemoveAll(universityId int) error
-	GetByPage(universityId, page int) ([]models.Subject, error)
-	SearchByNameAndSemester(universityId int, name, semester string) ([]models.Subject, error)
-	SearchByName(universityId int, name string) ([]models.Subject, error)
+	Search(universityId int, name, semester string, page int) ([]models.Subject, error)
+	GetAllSubjects(universityId, page int) ([]models.Subject, error)
+
+	GetItemsPerPageCount() int
 }
