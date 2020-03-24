@@ -25,13 +25,14 @@ func (uc *UniversityControllerPg) GetAll(page int) ([]University, error) {
 	var rows *sql.Rows
 	var err error
 	if page > 0 {
-		rows, err = uc.db.Query("SELECT university_id, name FROM universities "+
-			"ORDER BY ASC "+
+		rows, err = uc.db.Query("SELECT university_id, name, full_name FROM universities "+
+			"ORDER BY name ASC "+
 			"LIMIT $1 OFFSET $2",
 			uc.itemsPerPage, (page-1)*uc.itemsPerPage)
 	} else if page == 0 {
 		// All objects
-		rows, err = uc.db.Query("SELECT university_id, name FROM universities ORDER BY name ASC")
+		rows, err = uc.db.Query("SELECT university_id, name, full_name FROM universities " +
+			"ORDER BY name ASC")
 	} else {
 		return nil, errs.IncorrectPageNumber
 	}
@@ -43,25 +44,27 @@ func (uc *UniversityControllerPg) GetAll(page int) ([]University, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var u University
-		rows.Scan(&u.Id, &u.Name)
+		rows.Scan(&u.Id, &u.Name, &u.FullName)
 		universities = append(universities, u)
 	}
 	return universities, nil
 }
 
 func (uc *UniversityControllerPg) GetById(id int) (*University, error) {
-	row := uc.db.QueryRow("SELECT university_id, name FROM universities WHERE university_id = $1", id)
+	row := uc.db.QueryRow("SELECT university_id, name, full_name FROM universities "+
+		"WHERE university_id = $1", id)
 	var u University
-	err := row.Scan(&u.Id, &u.Name)
+	err := row.Scan(&u.Id, &u.Name, &u.FullName)
 	if err != nil {
 		return nil, err
 	}
 	return &u, nil
 }
 
-func (uc *UniversityControllerPg) Add(name string) (int, error) {
+func (uc *UniversityControllerPg) Add(name, fullName string) (int, error) {
 	var idUniversity int
-	err := uc.db.QueryRow("INSERT INTO universities (name) VALUES ($1) RETURNING university_id", name).Scan(&idUniversity)
+	err := uc.db.QueryRow("INSERT INTO universities (name, full_name) VALUES ($1, $2) "+
+		"RETURNING university_id", name, fullName).Scan(&idUniversity)
 	if err != nil {
 		return 0, err
 	}
@@ -93,13 +96,13 @@ func (uc *UniversityControllerPg) Search(name string, page int) ([]models.Univer
 	var rows *sql.Rows
 	var err error
 	if page > 0 {
-		rows, err = uc.db.Query("SELECT university_id, name FROM universities "+
+		rows, err = uc.db.Query("SELECT university_id, name, full_name FROM universities "+
 			"WHERE LOWER(name) LIKE '%' || $1 || '%' "+
 			"ORDER BY name ASC LIMIT $2 OFFSET $3",
 			strings.ToLower(name), uc.itemsPerPage, (page-1)*uc.itemsPerPage)
 	} else if page == 0 {
 		// All objects
-		rows, err = uc.db.Query("SELECT university_id, name FROM universities "+
+		rows, err = uc.db.Query("SELECT university_id, name, full_name FROM universities "+
 			"WHERE LOWER(name) LIKE '%' || $1 || '%' "+
 			"ORDER BY name ASC", strings.ToLower(name))
 	} else {
@@ -109,7 +112,7 @@ func (uc *UniversityControllerPg) Search(name string, page int) ([]models.Univer
 	var universities []models.University
 	for rows.Next() {
 		var u models.University
-		err = rows.Scan(&u.Id, &u.Name)
+		err = rows.Scan(&u.Id, &u.Name, &u.FullName)
 		if err != nil {
 			continue
 		}
