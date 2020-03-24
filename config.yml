@@ -8,3 +8,5 @@ university:
     itemsPerPage: 5
 subject:
     itemsPerPage: 5
+material:
+    itemsPerPage: 5
