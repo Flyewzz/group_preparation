@@ -5,58 +5,11 @@ import {observer} from "mobx-react";
 import UniversitiesService from "../services/UniversitiesService";
 import {decorate, observable, runInAction} from "mobx";
 
-const data = [
-  {
-    id: 0,
-    short: 'МГТУ им. Баумана',
-    full: 'Московский государственный технический университет имени Баумана'
-  },
-  {
-    id: 1,
-    short: 'ВШЭ',
-    full: 'Высшая школа экономика'
-  },
-  {
-    id: 2,
-    short: 'МГУ им. Ломоносова',
-    full: 'Московский государственный университет имени Ломоносова'
-  },
-  {
-    id: 3,
-    short: 'ГУУ',
-    full: 'Государственный университет управления'
-  },
-  {
-    id: 4,
-    short: 'МГТУ им. Баумана',
-    full: 'Московский государственный технический университет имени Баумана'
-  },
-  {
-    id: 5,
-    short: 'ВШЭ',
-    full: 'Высшая школа экономика'
-  },
-  {
-    id: 6,
-    short: 'МГУ им. Ломоносова',
-    full: 'Московский государственный университет имени Ломоносова'
-  },
-  {
-    id: 7,
-    short: 'ГУУ',
-    full: 'Государственный университет управления'
-  },
-  {
-    id: 8,
-    short: 'МГУ им. Ломоносова',
-    full: 'Московский государственный университет имени Ломоносова'
-  },
-];
-
 class MainPage extends React.Component {
   constructor(props) {
     super(props);
 
+    this.currPage = 1;
     this.pageCount = 1;
     this.universitiesService = new UniversitiesService();
   }
@@ -64,24 +17,21 @@ class MainPage extends React.Component {
   universities = [];
 
   componentDidMount() {
-    const page = 1; // get from url
+    const page = 1; // TODO get from url
     this.getUniversities(page);
   }
 
   getUniversities = (page) => {
     this.currPage = page;
     this.universitiesService.getPage(page).then((result) => {
+        console.log(result);
         runInAction(() => {
-          // this.pageCount = result.pages;
-          // this.universities = result.payload;
-          this.pageCount = 5;
-          this.universities = data;
+          this.pageCount = result.pages;
+          this.universities = result.payload;
         });
       },
       (error) => {
         console.log(error);
-        this.pageCount = 5;
-        this.universities = data;
       });
   };
 

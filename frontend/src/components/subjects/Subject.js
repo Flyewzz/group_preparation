@@ -28,7 +28,7 @@ function Subject(props) {
       <ListItemText disableTypography className={styles.text} primary={props.subject.name}/>
       <ListItemSecondaryAction>
         <Typography >
-          {props.subject.files}
+          {props.subject.semester}
         </Typography>
       </ListItemSecondaryAction>
     </Link>

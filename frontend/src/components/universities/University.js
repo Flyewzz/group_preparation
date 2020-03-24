@@ -8,8 +8,8 @@ function University(props) {
     <Link component={RouterLink} to={'/university/' + props.university.id}
           underline="none"
           color="inherit">
-      <ListItemText primary={props.university.short}
-                    secondary={props.university.full}/>
+      <ListItemText primary={props.university.name}
+                    secondary={props.university.full_name}/>
     </Link>
   );
 }

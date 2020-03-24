@@ -73,6 +73,7 @@ class UniversityPage extends React.Component {
   constructor(props) {
     super(props);
 
+    this.currPage = 1;
     this.pageCount = 1;
     this.subjectsService = new SubjectsService();
   }
@@ -80,25 +81,21 @@ class UniversityPage extends React.Component {
   subjects = [];
 
   componentDidMount() {
-    const page = 1; // get from url
-    console.log('mounting');
+    const page = 1; // TODO get from url
     this.getSubjects(page);
   }
 
   getSubjects = (page) => {
+    const id = this.props.id;
     this.currPage = page;
-    this.subjectsService.getPage(page).then((result) => {
+    this.subjectsService.getPage(id, page).then((result) => {
         runInAction(() => {
-          // this.pageCount = result.pages;
-          // this.universities = result.payload;
-          this.pageCount = 5;
-          this.subjects = data;
+          this.pageCount = result.pages;
+          this.subjects = result.payload ? result.payload : [];
         });
       },
       (error) => {
         console.log(error);
-        this.pageCount = 5;
-        this.subjects = data;
       });
   };
 
@@ -115,8 +112,7 @@ class UniversityPage extends React.Component {
                      onChange={this.onPageClick}
                      items={this.subjects.map((value) =>
                        <Subject subject={value}/>
-                     )}>
-      </ListContainer>
+                     )}/>
     );
   }
 }

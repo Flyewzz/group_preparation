@@ -3,16 +3,18 @@ import config from '../config';
 class UniversitiesService {
   getByName = async (name) => {
     const url = config.apiUrl + 'universities?name' + name;
-    const options = {method: 'GET', credentials: 'include'};
+    const options = {method: 'GET'};
     const request = new Request(url, options);
-    return await fetch(request);
+    const response = await fetch(request);
+    return response.json();
   };
 
   getPage = async (pageNumber) => {
     const url = config.apiUrl + 'universities?page=' + pageNumber;
-    const options = {method: 'GET', credentials: 'include'};
+    const options = {method: 'GET'};
     const request = new Request(url, options);
-    return await fetch(request);
+    const response = await fetch(request);
+    return response.json();
   };
 }
 
