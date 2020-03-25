@@ -47,7 +47,7 @@ function FilterLine(props) {
 
   return (
     <div className={styles.wrapper}>
-      <SearchInput placeholder={'Название...'}/>
+      <SearchInput onChange={props.onNameChange} placeholder={'Название...'}/>
       <FormControl variant="outlined" className={styles.formControl}>
         <InputLabel className={styles.label}
                     id="demo-simple-select-outlined-label">

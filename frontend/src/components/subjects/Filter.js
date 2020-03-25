@@ -33,7 +33,7 @@ function Filter(props) {
 
   return (
     <div className={styles.filter}>
-      <SearchInput placeholder={'Название...'}/>
+      <SearchInput onChange={props.onNameChange} placeholder={'Название...'}/>
       <FormControl variant="outlined" className={styles.formControl}>
         <InputLabel className={styles.label}
                     id="demo-simple-select-outlined-label">

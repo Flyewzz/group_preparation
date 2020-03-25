@@ -25,6 +25,7 @@ function SearchInput(props) {
     <div className={styles.inputBox}>
       <SearchIcon/>
       <InputBase fullWidth
+                 onChange={props.onChange}
                  placeholder={props.placeholder}
                  className={styles.input}
                  inputProps={{'aria-label': 'search'}}

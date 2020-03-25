@@ -6,69 +6,6 @@ import Subject from "../components/subjects/Subject";
 import Filter from "../components/subjects/Filter";
 import SubjectsService from "../services/SubjectsService";
 
-const data = [
-  {
-    id: 1,
-    name: 'Физика',
-    files: 2,
-  },
-  {
-    id: 2,
-    name: 'Математический анализ',
-    files: 2,
-  },
-  {
-    id: 3,
-    name: 'Дискретная математика',
-    files: 2,
-  },
-  {
-    id: 4,
-    name: 'Экология',
-    files: 2,
-  },
-  {
-    id: 5,
-    name: 'Аналитическая геометрия',
-    files: 2,
-  },
-  {
-    id: 6,
-    name: 'Физика',
-    files: 2,
-  },
-  {
-    id: 7,
-    name: 'Математический анализ',
-    files: 2,
-  },
-  {
-    id: 8,
-    name: 'Дискретная математика',
-    files: 2,
-  },
-  {
-    id: 9,
-    name: 'Экология',
-    files: 2,
-  },
-  {
-    id: 10,
-    name: 'Аналитическая геометрия',
-    files: 2,
-  },
-  {
-    id: 11,
-    name: 'Аналитическая геометрия',
-    files: 2,
-  },
-  {
-    id: 12,
-    name: 'Аналитическая геометрия',
-    files: 2,
-  },
-];
-
 class UniversityPage extends React.Component {
   constructor(props) {
     super(props);
@@ -108,10 +45,16 @@ class UniversityPage extends React.Component {
     this.getSubjects(1, this.name, this.semester);
   };
 
+  onNameChange = (event) => {
+    this.name = event.target.value;
+    this.getSubjects(1, this.name, this.semester);
+  };
+
   render() {
     return (
       <ListContainer title={'Предметы'}
-                     subheader={<Filter onSemesterChange={this.onSemesterChange}/>}
+                     subheader={<Filter onNameChange={this.onNameChange}
+                                        onSemesterChange={this.onSemesterChange}/>}
                      currPage={this.currPage}
                      pageCount={this.pageCount}
                      onChange={this.onPageClick}
