@@ -9,7 +9,8 @@ type HandlerData struct {
 }
 
 func NewHandlerData(uc interfaces.UniversityController,
-	sc interfaces.SubjectController, mc interfaces.MaterialController) *HandlerData {
+	sc interfaces.SubjectController,
+	mc interfaces.MaterialController) *HandlerData {
 	return &HandlerData{
 		UniversityController: uc,
 		SubjectController:    sc,

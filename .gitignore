@@ -13,5 +13,7 @@
 
 _debug_bin
 
+./files/*
+
 # Dependency directories (remove the comment below to include it)
 # vendor/

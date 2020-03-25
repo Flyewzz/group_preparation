@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Flyewzz/group_preparation/errs"
+	"github.com/Flyewzz/group_preparation/interfaces"
 	"github.com/Flyewzz/group_preparation/models"
 	. "github.com/Flyewzz/group_preparation/models"
 )
@@ -13,12 +14,15 @@ import (
 type MaterialControllerPg struct {
 	itemsPerPage int
 	db           *sql.DB
+	mfc          MaterialFileControllerPg
 }
 
-func NewMaterialControllerPg(itemsPerPage int, db *sql.DB) *MaterialControllerPg {
+func NewMaterialControllerPg(itemsPerPage int, db *sql.DB,
+	mfc MaterialFileControllerPg) *MaterialControllerPg {
 	return &MaterialControllerPg{
 		itemsPerPage: itemsPerPage,
 		db:           db,
+		mfc:          mfc,
 	}
 }
 
@@ -61,6 +65,13 @@ func (mc *MaterialControllerPg) GetAllMaterials(subjectId, page int) ([]Material
 	return materials, nil
 }
 
+func (mc *MaterialControllerPg) GetElementsCount(subjectId int) (int, error) {
+	var cnt int
+	err := mc.db.QueryRow("SELECT COUNT(*) FROM materials "+
+		"WHERE subject_id = $1", subjectId).Scan(&cnt)
+	return cnt, err
+}
+
 func (mc *MaterialControllerPg) GetById(id int) (*MaterialData, error) {
 	row := mc.db.QueryRow("SELECT m.material_id, m.name, wt.name, u.email, m.date "+
 		"FROM materials m "+
@@ -76,12 +87,33 @@ func (mc *MaterialControllerPg) GetById(id int) (*MaterialData, error) {
 	return &m, nil
 }
 
-func (mc *MaterialControllerPg) Add(subjectId int, name string, typeId, authorId int) (int, error) {
+func (mc *MaterialControllerPg) Add(subjectId int, name string,
+	typeId, authorId int, materialId chan<- int, files <-chan models.MaterialFile) error {
 	var idMaterial int
-	err := mc.db.QueryRow("INSERT INTO materials (subject_id, name, type_id, author_id) "+
+	tx, err := mc.db.Begin()
+	if err != nil {
+		return err
+	}
+	err = mc.db.QueryRow("INSERT INTO materials (subject_id, name, type_id, author_id) "+
 		"VALUES ($1, $2, $3, $4) RETURNING material_id",
 		subjectId, name, typeId, authorId).Scan(&idMaterial)
-	return idMaterial, err
+	if err != nil {
+		tx.Rollback()
+	}
+	materialId <- idMaterial
+	for file := range files {
+		if file.Path == "Incorrect" {
+			tx.Rollback()
+			return errors.New("File error")
+		}
+		_, err = mc.mfc.Add(file.Name, file.Path, idMaterial)
+		if err != nil {
+			tx.Rollback()
+			return errors.New("File error")
+		}
+	}
+	tx.Commit()
+	return err
 }
 
 func (mc *MaterialControllerPg) RemoveById(id int) error {
@@ -194,4 +226,8 @@ func (mc *MaterialControllerPg) Search(subjectId int, name string, typeId, page 
 
 func (mc MaterialControllerPg) GetItemsPerPageCount() int {
 	return mc.itemsPerPage
+}
+
+func (mc MaterialControllerPg) GetMaterialFileController() interfaces.MaterialFileController {
+	return &mc.mfc
 }

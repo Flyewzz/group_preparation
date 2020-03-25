@@ -10,3 +10,5 @@ subject:
     itemsPerPage: 5
 material:
     itemsPerPage: 5
+    files:
+        directory: ./files/

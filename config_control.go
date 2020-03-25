@@ -26,7 +26,9 @@ func PrepareHandlerData() *handlers.HandlerData {
 	}
 	universityController := pg.NewUniversityControllerPg(viper.GetInt("university.itemsPerPage"), db)
 	subjectController := pg.NewSubjectControllerPg(viper.GetInt("subject.itemsPerPage"), db)
-	materialController := pg.NewMaterialControllerPg(viper.GetInt("material.itemsPerPage"), db)
+	materialFileController := pg.NewMaterialFileControllerPg(db)
+	materialController := pg.NewMaterialControllerPg(viper.GetInt("material.itemsPerPage"), db,
+		*materialFileController)
 	return handlers.NewHandlerData(universityController,
 		subjectController, materialController)
 }

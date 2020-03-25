@@ -4,7 +4,7 @@ create table universities
     constraint universities_pk
       primary key,
   name          varchar(150) not null,
-  full_name     varchar(300) not null
+  full_name     varchar(1000) not null
 );
 
 alter table universities
@@ -99,20 +99,8 @@ create table materials
 alter table materials
   owner to postgres;
 
-create table materialfiles
-(
-  file_id     serial        not null
-    constraint materialfiles_pk
-      primary key,
-  name        varchar(255)  not null,
-  path        varchar(2048) not null,
-  material_id integer       not null
-    constraint materialfiles_materials_material_id_fk
-      references materials
-      on delete cascade
-);
+create unique index subjects_subject_id_uindex
+	on subjects (name, semester);
 
-alter table materialfiles
-  owner to postgres;
 
 

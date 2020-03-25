@@ -7,4 +7,5 @@ type Material struct {
 	TypeId    int    `json:"type_id"`
 	AuthorId  int    `json:"author_id"`
 	Date      string `json:"date"`
+	Status    bool   `json:"-"`
 }

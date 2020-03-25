@@ -6,11 +6,14 @@ import (
 
 type MaterialController interface {
 	GetById(id int) (*models.MaterialData, error)
-	Add(subjectId int, name string, typeId, authorId int) (int, error)
+	Add(subjectId int, name string,
+		typeId, authorId int, materialId chan<- int, files <-chan models.MaterialFile) error
 	RemoveById(id int) error
 	RemoveAll(subjectId int) error
 	Search(subjectId int, name string, typeId, page int) ([]models.MaterialData, error)
 	GetAllMaterials(subjectId, page int) ([]models.MaterialData, error)
-
+	GetElementsCount(subjectId int) (int, error)
 	GetItemsPerPageCount() int
+
+	GetMaterialFileController() MaterialFileController
 }

@@ -29,16 +29,19 @@ func (hd *HandlerData) UniversitiesHandler(w http.ResponseWriter, r *http.Reques
 	/* If name is empty, then give all universities.
 	 * Search universities by name otherwise
 	 */
+	var elementsCount int = 0
 	if name == "" {
 		universities, err = hd.UniversityController.GetAll(page)
+		elementsCount, err = hd.UniversityController.GetElementsCount()
 	} else {
 		universities, err = hd.UniversityController.Search(name, page)
+		elementsCount = len(universities)
 	}
 	if err != nil {
 		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
 		return
 	}
-	pagesCount := features.CalculatePageCount(len(universities),
+	pagesCount := features.CalculatePageCount(elementsCount,
 		hd.SubjectController.GetItemsPerPageCount())
 	universitiesEncoded, err := json.Marshal(universities)
 	if err != nil {
