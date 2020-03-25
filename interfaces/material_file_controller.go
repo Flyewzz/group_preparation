@@ -6,6 +6,6 @@ import (
 
 type MaterialFileController interface {
 	GetById(id int) (*models.MaterialData, error)
-	Add(name, path string, materialId int) (int, error)
-	GetAll(materialId int) ([]models.MaterialData, error)
+	// Add(name, path string, materialId int) (int, error)
+	GetAll(materialId int) ([]models.MaterialFile, error)
 }

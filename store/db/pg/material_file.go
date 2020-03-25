@@ -24,7 +24,8 @@ func NewMaterialFileControllerPg(db *sql.DB) *MaterialFileControllerPg {
 // r.HandleFunc("/material/{id}/files/downloading", hd.MaterialFilesDownloadHandler).Methods("GET")
 
 func (mfc *MaterialFileControllerPg) GetAll(materialId int) ([]MaterialFile, error) {
-	rows, err := mfc.db.Query("SELECT file_id, name from materialfiles")
+	rows, err := mfc.db.Query("SELECT file_id, name from materialfiles "+
+		"WHERE material_id = $1", materialId)
 	if err != nil {
 		return nil, err
 	}

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Flyewzz/group_preparation/errs"
+	"github.com/Flyewzz/group_preparation/interfaces"
 	"github.com/Flyewzz/group_preparation/models"
 	. "github.com/Flyewzz/group_preparation/models"
 )
@@ -225,4 +226,8 @@ func (mc *MaterialControllerPg) Search(subjectId int, name string, typeId, page 
 
 func (mc MaterialControllerPg) GetItemsPerPageCount() int {
 	return mc.itemsPerPage
+}
+
+func (mc MaterialControllerPg) GetMaterialFileController() interfaces.MaterialFileController {
+	return &mc.mfc
 }

@@ -15,5 +15,5 @@ type MaterialController interface {
 	GetElementsCount(subjectId int) (int, error)
 	GetItemsPerPageCount() int
 
-	// GetMaterialFileController() MaterialController
+	GetMaterialFileController() MaterialFileController
 }

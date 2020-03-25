@@ -3,11 +3,14 @@ package handlers
 import (
 	// "log"
 
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 
+	"github.com/gorilla/mux"
 	uuid "github.com/satori/go.uuid"
 	"github.com/spf13/viper"
 )
@@ -17,6 +20,29 @@ import (
 // r.HandleFunc("/material/{id}/files", hd.GetMaterialFilesHandler).Methods("GET")
 // r.HandleFunc("/material/file/downloading", hd.MaterialFileDownloadHandler).Methods("GET")
 // r.HandleFunc("/material/{id}/files/downloading", hd.MaterialFilesDownloadHandler).Methods("GET")
+
+func (hd *HandlerData) GetMaterialFilesHandler(w http.ResponseWriter, r *http.Request) {
+	var err error
+	strId := mux.Vars(r)["id"]
+	materialId, err := strconv.Atoi(strId)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	files, err := hd.MaterialController.GetMaterialFileController().GetAll(materialId)
+
+	if err != nil {
+		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		return
+	}
+
+	data, err := json.Marshal(files)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	w.Write(data)
+}
 
 func (hd *HandlerData) MaterialFilesDownloadHandler(w http.ResponseWriter, r *http.Request) {
 	reader, err := r.MultipartReader()
