@@ -196,7 +196,8 @@ function SubjectPage(props) {
             <div className={styles.name}>
               {props.title}
             </div>
-            <FilterLine onNameChange={props.onNameChange}
+            <FilterLine id={props.id}
+                        onNameChange={props.onNameChange}
                         onTypeChange={props.onTypeChange}/>
             <table className={styles.table}>
               <TableHeader/>
@@ -288,7 +289,8 @@ class SubjectPageController extends React.Component {
 
   render() {
     return (
-      <SubjectPage title={this.subject.name}
+      <SubjectPage id={this.subject.id}
+                   title={this.subject.name}
                    data={this.materials}
                    currPage={this.currPage}
                    pageCount={this.pageCount}

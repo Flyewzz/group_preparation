@@ -75,7 +75,8 @@ function FilterLine(props) {
           <MenuItem value={9}>Методы</MenuItem>
         </Select>
       </FormControl>
-      <AddButton disableElevation variant="contained" color="primary">
+      <AddButton href={'/add_material/' + props.id}
+                 disableElevation variant="contained" color="primary">
         Добавить
       </AddButton>
     </div>

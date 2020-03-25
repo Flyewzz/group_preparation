@@ -24,7 +24,7 @@ function Header() {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Button className={classes.appName}>ExamPrep</Button>
+        <Button href="/" className={classes.appName}>ExamPrep</Button>
         <Button href="#" className={classes.color}>Sign In</Button>
         <Button variant="outlined" className={classes.color}>Sign Up</Button>
       </Toolbar>
