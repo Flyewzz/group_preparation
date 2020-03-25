@@ -109,6 +109,7 @@ create table materialfiles
   material_id integer       not null
     constraint materialfiles_materials_material_id_fk
       references materials
+      on delete cascade
 );
 
 alter table materialfiles

@@ -10,60 +10,41 @@ import (
 	. "github.com/Flyewzz/group_preparation/models"
 )
 
-type MaterialControllerPg struct {
-	itemsPerPage int
-	db           *sql.DB
+type MaterialFileControllerPg struct {
+	db *sql.DB
 }
 
-func NewMaterialControllerPg(itemsPerPage int, db *sql.DB) *MaterialControllerPg {
-	return &MaterialControllerPg{
-		itemsPerPage: itemsPerPage,
-		db:           db,
+func NewMaterialFileControllerPg(db *sql.DB) *MaterialFileControllerPg {
+	return &MaterialFileControllerPg{
+		db: db,
 	}
 }
 
-func (mc *MaterialControllerPg) GetAllMaterials(subjectId, page int) ([]MaterialData, error) {
-	itemsPerPage := mc.itemsPerPage
-	var rows *sql.Rows
-	var err error
-	if page > 0 {
-		rows, err = mc.db.Query("SELECT m.material_id, m.name, wt.name, u.email, m.date "+
-			"FROM materials m "+
-			"INNER JOIN worktypes wt ON m.type_id = wt.type_id "+
-			"INNER JOIN users u ON m.author_id = u.user_id "+
-			"WHERE m.subject_id = $1 "+
-			"ORDER BY m.name ASC LIMIT $2 OFFSET $3", subjectId,
-			itemsPerPage, (page-1)*itemsPerPage)
-	} else if page == 0 {
-		// All objects
-		rows, err = mc.db.Query("SELECT m.material_id, m.name, wt.name, u.email, m.date "+
-			"FROM materials m "+
-			"INNER JOIN worktypes wt ON m.type_id = wt.type_id "+
-			"INNER JOIN users u ON m.author_id = u.user_id "+
-			"WHERE m.subject_id = $1 "+
-			"ORDER BY m.name ASC", subjectId)
-			mc.db.
-	} else {
-		return nil, errs.IncorrectPageNumber
-	}
+// // MaterialFiles
+// r.HandleFunc("/material/{id}/files", hd.AddMaterialFilesHandler).Methods("POST")
+// r.HandleFunc("/material/{id}/files", hd.GetMaterialFilesHandler).Methods("GET")
+// r.HandleFunc("/material/file/downloading", hd.MaterialFileDownloadHandler).Methods("GET")
+// r.HandleFunc("/material/{id}/files/downloading", hd.MaterialFilesDownloadHandler).Methods("GET")
+
+func (mfc *MaterialFileControllerPg) GetAll(materialId int) ([]MaterialFile, error) {
+	rows, err := mfc.db.Query("SELECT file_id, name from materialfiles")
 	if err != nil {
 		return nil, err
 	}
-
-	var materials []MaterialData
+	var files []MaterialFile
 	for rows.Next() {
-		var m MaterialData
-		err := rows.Scan(&m.MaterialId, &m.Name, &m.TypeName, &m.UserEmail, &m.Date)
+		var f MaterialFile
+		err := rows.Scan(&f.Id, &f.Name)
 		if err != nil {
 			continue
 		}
-		materials = append(materials, m)
+		files = append(files, f)
 	}
-	return materials, nil
+	return files, nil
 }
 
-func (mc *MaterialControllerPg) GetById(id int) (*MaterialData, error) {
-	row := mc.db.QueryRow("SELECT m.material_id, m.name, wt.name, u.email, m.date "+
+func (mfc *MaterialFileControllerPg) GetById(id int) (*MaterialData, error) {
+	row := mfc.db.QueryRow("SELECT m.material_id, m.name, wt.name, u.email, m.date "+
 		"FROM materials m "+
 		"INNER JOIN worktypes wt ON m.type_id = wt.type_id "+
 		"INNER JOIN users u ON m.author_id = u.user_id "+
@@ -77,16 +58,16 @@ func (mc *MaterialControllerPg) GetById(id int) (*MaterialData, error) {
 	return &m, nil
 }
 
-func (mc *MaterialControllerPg) Add(subjectId int, name string, typeId, authorId int) (int, error) {
+func (mfc *MaterialFileControllerPg) Add(subjectId int, name string, typeId, authorId int) (int, error) {
 	var idMaterial int
-	err := mc.db.QueryRow("INSERT INTO materials (subject_id, name, type_id, author_id) "+
+	err := mfc.db.QueryRow("INSERT INTO materials (subject_id, name, type_id, author_id) "+
 		"VALUES ($1, $2, $3, $4) RETURNING material_id",
 		subjectId, name, typeId, authorId).Scan(&idMaterial)
 	return idMaterial, err
 }
 
-func (mc *MaterialControllerPg) RemoveById(id int) error {
-	result, err := mc.db.Exec("DELETE FROM materials WHERE material_id = $1", id)
+func (mfc *MaterialFileControllerPg) RemoveById(id int) error {
+	result, err := mfc.db.Exec("DELETE FROM materials WHERE material_id = $1", id)
 	if err != nil {
 		return err
 	}
@@ -100,20 +81,20 @@ func (mc *MaterialControllerPg) RemoveById(id int) error {
 	return err
 }
 
-func (mc *MaterialControllerPg) RemoveAll(subjectId int) error {
+func (mfc *MaterialFileControllerPg) RemoveAll(subjectId int) error {
 	// #! Removed all the files too. Warning!
-	_, err := mc.db.Exec("DELETE FROM materials WHERE subject_id = $1", subjectId)
+	_, err := mfc.db.Exec("DELETE FROM materials WHERE subject_id = $1", subjectId)
 	return err
 }
 
-func (mc *MaterialControllerPg) Search(subjectId int, name string, typeId, page int) ([]models.MaterialData, error) {
+func (mfc *MaterialFileControllerPg) Search(subjectId int, name string, typeId, page int) ([]models.MaterialData, error) {
 	var rows *sql.Rows
 	var err error
-	itemsPerPage := mc.itemsPerPage
+	itemsPerPage := mfc.itemsPerPage
 	if typeId != 0 && name != "" {
 		// Search by name and work type
 		if page > 0 {
-			rows, err = mc.db.Query("SELECT m.material_id, m.name, wt.name, u.email, m.date "+
+			rows, err = mfc.db.Query("SELECT m.material_id, m.name, wt.name, u.email, m.date "+
 				"FROM materials m "+
 				"INNER JOIN worktypes wt ON m.type_id = wt.type_id AND m.type_id = $1 "+
 				"INNER JOIN users u ON m.author_id = u.user_id "+
@@ -122,7 +103,7 @@ func (mc *MaterialControllerPg) Search(subjectId int, name string, typeId, page 
 				itemsPerPage, (page-1)*itemsPerPage)
 		} else if page == 0 {
 			// All objects
-			rows, err = mc.db.Query("SELECT m.material_id, m.name, wt.name, u.email, m.date "+
+			rows, err = mfc.db.Query("SELECT m.material_id, m.name, wt.name, u.email, m.date "+
 				"FROM materials m "+
 				"INNER JOIN worktypes wt ON m.type_id = wt.type_id AND m.type_id = $1 "+
 				"INNER JOIN users u ON m.author_id = u.user_id "+
@@ -134,7 +115,7 @@ func (mc *MaterialControllerPg) Search(subjectId int, name string, typeId, page 
 	} else if typeId == 0 {
 		// Search only by name
 		if page > 0 {
-			rows, err = mc.db.Query("SELECT m.material_id, m.name, wt.name, u.email, m.date "+
+			rows, err = mfc.db.Query("SELECT m.material_id, m.name, wt.name, u.email, m.date "+
 				"FROM materials m "+
 				"INNER JOIN worktypes wt ON m.type_id = wt.type_id "+
 				"INNER JOIN users u ON m.author_id = u.user_id "+
@@ -143,7 +124,7 @@ func (mc *MaterialControllerPg) Search(subjectId int, name string, typeId, page 
 				itemsPerPage, (page-1)*itemsPerPage)
 		} else if page == 0 {
 			// All objects
-			rows, err = mc.db.Query("SELECT m.material_id, m.name, wt.name, u.email, m.date "+
+			rows, err = mfc.db.Query("SELECT m.material_id, m.name, wt.name, u.email, m.date "+
 				"FROM materials m "+
 				"INNER JOIN worktypes wt ON m.type_id = wt.type_id "+
 				"INNER JOIN users u ON m.author_id = u.user_id "+
@@ -155,7 +136,7 @@ func (mc *MaterialControllerPg) Search(subjectId int, name string, typeId, page 
 	} else if name == "" {
 		// Search only by work type
 		if page > 0 {
-			rows, err = mc.db.Query("SELECT m.material_id, m.name, wt.name, u.email, m.date "+
+			rows, err = mfc.db.Query("SELECT m.material_id, m.name, wt.name, u.email, m.date "+
 				"FROM materials m "+
 				"INNER JOIN worktypes wt ON m.type_id = wt.type_id AND m.type_id = $1 "+
 				"INNER JOIN users u ON m.author_id = u.user_id "+
@@ -164,7 +145,7 @@ func (mc *MaterialControllerPg) Search(subjectId int, name string, typeId, page 
 				itemsPerPage, (page-1)*itemsPerPage)
 		} else if page == 0 {
 			// All objects
-			rows, err = mc.db.Query("SELECT m.material_id, m.name, wt.name, u.email, m.date "+
+			rows, err = mfc.db.Query("SELECT m.material_id, m.name, wt.name, u.email, m.date "+
 				"FROM materials m "+
 				"INNER JOIN worktypes wt ON m.type_id = wt.type_id AND m.type_id = $1 "+
 				"INNER JOIN users u ON m.author_id = u.user_id "+
@@ -193,6 +174,6 @@ func (mc *MaterialControllerPg) Search(subjectId int, name string, typeId, page 
 	return materials, nil
 }
 
-func (mc MaterialControllerPg) GetItemsPerPageCount() int {
-	return mc.itemsPerPage
+func (mfc MaterialControllerPg) GetItemsPerPageCount() int {
+	return mfc.itemsPerPage
 }

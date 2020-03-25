@@ -90,6 +90,7 @@ func (hd *HandlerData) AddMaterialHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 	// AuthorId always will be 1 in debug (the first user makes everything temporary)
+	hd.MaterialController
 	addedId, err := hd.MaterialController.Add(subjectId, name, typeId, 1)
 	if err != nil {
 		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
