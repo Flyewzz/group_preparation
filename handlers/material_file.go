@@ -3,16 +3,15 @@ package handlers
 import (
 	// "log"
 
+	"database/sql"
 	"encoding/json"
-	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
 
 	"github.com/gorilla/mux"
-	uuid "github.com/satori/go.uuid"
-	"github.com/spf13/viper"
 )
 
 // // MaterialFiles
@@ -44,33 +43,71 @@ func (hd *HandlerData) GetMaterialFilesHandler(w http.ResponseWriter, r *http.Re
 	w.Write(data)
 }
 
-func (hd *HandlerData) MaterialFilesDownloadHandler(w http.ResponseWriter, r *http.Request) {
-	reader, err := r.MultipartReader()
+func (hd *HandlerData) MaterialFileDownloadHandler(w http.ResponseWriter, r *http.Request) {
+	strId := r.URL.Query().Get("id")
+	if strId == "" {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	id, err := strconv.Atoi(strId)
 	if err != nil {
-		fmt.Println(err)
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
 	}
-	var uuids []string
-	for {
-		file, err := reader.NextPart()
-		if err == io.EOF {
-			break
-		}
-
-		if file.FileName() == "" {
-			continue
-		}
-		// Generate UUID key as a filename to store it into the temporary folder
-		uuid := uuid.NewV4().String()
-		dst, err := os.Create(viper.GetString("") + uuid)
-		if err != nil {
-			fmt.Println(err)
-		}
-		uuids = append(uuids, uuid)
-
-		io.Copy(dst, file)
+	if id < 1 {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
 	}
+	file, err := hd.MaterialController.GetMaterialFileController().GetById(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "Not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	openedFile, err := os.Open(file.Path)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	defer openedFile.Close()
+	//File is found, create and send the correct headers
 
+	//Get the Content-Type of the file
+	//Create a buffer to store the header of the file in
+	FileHeader := make([]byte, 512)
+	//Copy the headers into the FileHeader buffer
+	openedFile.Read(FileHeader)
+	//Get content type of file
+	FileContentType := http.DetectContentType(FileHeader)
+
+	//Get the file size
+	FileStat, _ := openedFile.Stat()                   //Get info from the file
+	FileSize := strconv.FormatInt(FileStat.Size(), 10) //Get file size as a string
+	//Send the headers
+	w.Header().Set("Content-Disposition", "attachment; filename="+file.Name)
+	w.Header().Set("Content-Type", FileContentType)
+	w.Header().Set("Content-Length", FileSize)
+
+	//Send the file
+	//We read 512 bytes from the file already, so we reset the offset back to 0
+	openedFile.Seek(0, 0)
+	io.Copy(w, openedFile) //'Copy' the file to the client
+	data, err := ioutil.ReadAll(openedFile)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	w.Write(data)
 }
+
+// *Not realized yet
+
+// func (hd *HandlerData) MaterialFilesDownloadHandler(w http.ResponseWriter, r *http.Request) {
+
+// }
 
 // func (hd *HandlerData) AddMaterialFileHandler(w http.ResponseWriter, r *http.Request) {
 // 	err := r.ParseForm()

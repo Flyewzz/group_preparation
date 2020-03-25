@@ -5,7 +5,7 @@ import (
 )
 
 type MaterialFileController interface {
-	GetById(id int) (*models.MaterialData, error)
+	GetById(id int) (*models.MaterialFile, error)
 	// Add(name, path string, materialId int) (int, error)
 	GetAll(materialId int) ([]models.MaterialFile, error)
 }

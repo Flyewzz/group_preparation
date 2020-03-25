@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/Flyewzz/group_preparation/errs"
+	"github.com/Flyewzz/group_preparation/models"
 	. "github.com/Flyewzz/group_preparation/models"
 )
 
@@ -41,19 +42,12 @@ func (mfc *MaterialFileControllerPg) GetAll(materialId int) ([]MaterialFile, err
 	return files, nil
 }
 
-func (mfc *MaterialFileControllerPg) GetById(id int) (*MaterialData, error) {
-	row := mfc.db.QueryRow("SELECT m.material_id, m.name, wt.name, u.email, m.date "+
-		"FROM materials m "+
-		"INNER JOIN worktypes wt ON m.type_id = wt.type_id "+
-		"INNER JOIN users u ON m.author_id = u.user_id "+
-		"WHERE m.material_id = $1", id)
-	var m MaterialData
-	err := row.Scan(&m.MaterialId, &m.Name,
-		&m.TypeName, &m.UserEmail, &m.Date)
-	if err != nil {
-		return nil, err
-	}
-	return &m, nil
+func (mfc *MaterialFileControllerPg) GetById(id int) (*MaterialFile, error) {
+	row := mfc.db.QueryRow("SELECT file_id, name, path from materialfiles "+
+		"WHERE file_id = $1", id)
+	var f models.MaterialFile
+	err := row.Scan(&f.Id, &f.Name, &f.Path)
+	return &f, err
 }
 
 func (mfc *MaterialFileControllerPg) Add(name, path string, materialId int) (int, error) {
