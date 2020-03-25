@@ -4,6 +4,10 @@ import {makeStyles} from "@material-ui/core/styles";
 import MaterialDetails from "../components/material/MaterialDetails";
 import FilesList from "../components/files/FilesList";
 import Button from "@material-ui/core/Button";
+import SubjectsService from "../services/SubjectsService";
+import MaterialService from "../services/MaterialService";
+import {decorate, observable, runInAction} from "mobx";
+import {observer} from "mobx-react";
 
 const data = {
   name: 'РК №1',
@@ -15,7 +19,7 @@ const data = {
   type: 'РК',
   author: 'username',
   rating: 23,
-  description: 'Три прекрасных фотографии билетов и не менее прекрасные ответы на них',
+  description: 'Прекрасное длинное подробное описание восхитительнейших приложенных ниже файлов',
   files: [
     {
       name: 'bilet1.png',
@@ -66,8 +70,8 @@ function MaterialPage(props) {
 
   return (
     <Container maxWidth="sm" className={styles.wrapper}>
-      <div className={styles.name}>{data.name}</div>
-      <MaterialDetails material={data}/>
+      <div className={styles.name}>{props.data.name}</div>
+      <MaterialDetails material={props.data}/>
       <div className={styles.descriptionWrapper}>
         <span className={styles.description}>Описание:</span>
         <span>{data.description}</span>
@@ -82,4 +86,41 @@ function MaterialPage(props) {
   );
 }
 
-export default MaterialPage;
+class MaterialPageController extends React.Component {
+  constructor(props) {
+    super(props);
+    this.materialService = new MaterialService();
+  }
+
+  material = {date: ''};
+
+  componentDidMount() {
+    this.getMaterial();
+  }
+
+  getMaterial = () => {
+    const id = this.props.id;
+    this.materialService.getById(id).then((result) => {
+        runInAction(() => {
+          console.log(result);
+          this.material = result;
+        })
+      },
+      (error) => {
+        console.log(error)
+      })
+  };
+
+  render() {
+    return (
+      <MaterialPage data={this.material}/>
+    );
+  }
+}
+
+
+decorate(MaterialPageController, {
+  material: observable,
+});
+
+export default observer(MaterialPageController);

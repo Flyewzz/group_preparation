@@ -85,30 +85,31 @@ function Line(props) {
 
 function MaterialDetails(props) {
   const styles = useStyles();
+  const date = new Date(props.material.date.replace(' ', 'T')).toLocaleDateString();
 
   return (
     <table className={styles.table}>
       <tbody>
       <Line name={'ВУЗ'}
-            value={props.material.university}
+            value={'МГТУ им. Н.Э.Баумана'} // props.material.university}
             icon={<AccountBalanceRoundedIcon/>}/>
       <Line name={'Предмет'}
-            value={props.material.subject}
+            value={'Дискретная математика'} // props.material.subject}
             icon={<AssignmentRoundedIcon/>}/>
       <Line name={'Семестр'}
-            value={props.material.semester}
+            value={'4ый'} // props.material.semester}
             icon={<SchoolRoundedIcon/>}/>
       <Line name={'Тип'}
             value={props.material.type}
             icon={<FolderRoundedIcon/>}/>
       <Line name={'Дата'}
-            value={props.material.date}
+            value={date}
             icon={<InsertInvitationRoundedIcon/>}/>
       <Line name={'Автор'}
-            value={props.material.author}
+            value={props.material.user_email}
             icon={<PersonRoundedIcon/>}/>
       <Line name={'Рейтинг'}
-            value={props.material.rating}
+            value={0} // props.material.rating
             icon={<AssessmentRoundedIcon/>}/>
       </tbody>
     </table>

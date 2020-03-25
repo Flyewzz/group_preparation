@@ -14,6 +14,14 @@ class MaterialService {
     const response = await fetch(request);
     return response.json();
   };
+
+  getById = async (id) => {
+    const url = config.apiUrl + 'material?id=' + id ;
+    const options = {method: 'GET'};
+    const request = new Request(url, options);
+    const response = await fetch(request);
+    return response.json();
+  };
 }
 
 export default MaterialService;
