@@ -121,6 +121,7 @@ func (hd *HandlerData) AddMaterialHandler(w http.ResponseWriter, r *http.Request
 		dst, err := os.Create(filepath.Join(materialDirectoryPath, uuid))
 		if err != nil {
 			mFiles <- incorrectFile
+			break
 		}
 		mFile := models.MaterialFile{
 			Name: fileName,
@@ -129,11 +130,13 @@ func (hd *HandlerData) AddMaterialHandler(w http.ResponseWriter, r *http.Request
 		f, err := file.Open()
 		if err != nil {
 			mFiles <- incorrectFile
+			break
 		}
 		defer f.Close()
 		_, err = io.Copy(dst, f)
 		if err != nil {
 			mFiles <- incorrectFile
+			break
 		}
 		mFiles <- mFile
 	}
