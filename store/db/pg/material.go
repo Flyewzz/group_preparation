@@ -13,12 +13,15 @@ import (
 type MaterialControllerPg struct {
 	itemsPerPage int
 	db           *sql.DB
+	mfc          MaterialFileControllerPg
 }
 
-func NewMaterialControllerPg(itemsPerPage int, db *sql.DB) *MaterialControllerPg {
+func NewMaterialControllerPg(itemsPerPage int, db *sql.DB,
+	mfc MaterialFileControllerPg) *MaterialControllerPg {
 	return &MaterialControllerPg{
 		itemsPerPage: itemsPerPage,
 		db:           db,
+		mfc:          mfc,
 	}
 }
 
@@ -42,7 +45,6 @@ func (mc *MaterialControllerPg) GetAllMaterials(subjectId, page int) ([]Material
 			"INNER JOIN users u ON m.author_id = u.user_id "+
 			"WHERE m.subject_id = $1 "+
 			"ORDER BY m.name ASC", subjectId)
-			mc.db.
 	} else {
 		return nil, errs.IncorrectPageNumber
 	}
@@ -84,12 +86,33 @@ func (mc *MaterialControllerPg) GetById(id int) (*MaterialData, error) {
 	return &m, nil
 }
 
-func (mc *MaterialControllerPg) Add(subjectId int, name string, typeId, authorId int) (int, error) {
+func (mc *MaterialControllerPg) Add(subjectId int, name string,
+	typeId, authorId int, materialId chan<- int, files <-chan models.MaterialFile) error {
 	var idMaterial int
-	err := mc.db.QueryRow("INSERT INTO materials (subject_id, name, type_id, author_id) "+
+	tx, err := mc.db.Begin()
+	if err != nil {
+		return err
+	}
+	err = mc.db.QueryRow("INSERT INTO materials (subject_id, name, type_id, author_id) "+
 		"VALUES ($1, $2, $3, $4) RETURNING material_id",
 		subjectId, name, typeId, authorId).Scan(&idMaterial)
-	return idMaterial, err
+	if err != nil {
+		tx.Rollback()
+	}
+	materialId <- idMaterial
+	for file := range files {
+		if file.Path == "Incorrect" {
+			tx.Rollback()
+			return errors.New("File error")
+		}
+		_, err = mc.mfc.Add(file.Name, file.Path, idMaterial)
+		if err != nil {
+			tx.Rollback()
+			return errors.New("File error")
+		}
+	}
+	tx.Commit()
+	return err
 }
 
 func (mc *MaterialControllerPg) RemoveById(id int) error {

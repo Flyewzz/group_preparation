@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"os"
 
 	"github.com/Flyewzz/group_preparation/db"
 	"github.com/Flyewzz/group_preparation/handlers"
@@ -11,8 +10,8 @@ import (
 )
 
 func PrepareConfig() {
-	viper.SetConfigFile(os.Args[1])
-	// viper.SetConfigFile("config.yml")
+	// viper.SetConfigFile(os.Args[1])
+	viper.SetConfigFile("config.yml")
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Cannot read a config file: %v\n", err)
 	}
@@ -26,7 +25,9 @@ func PrepareHandlerData() *handlers.HandlerData {
 	}
 	universityController := pg.NewUniversityControllerPg(viper.GetInt("university.itemsPerPage"), db)
 	subjectController := pg.NewSubjectControllerPg(viper.GetInt("subject.itemsPerPage"), db)
-	materialController := pg.NewMaterialControllerPg(viper.GetInt("material.itemsPerPage"), db)
+	materialFileController := pg.NewMaterialFileControllerPg(db)
+	materialController := pg.NewMaterialControllerPg(viper.GetInt("material.itemsPerPage"), db,
+		*materialFileController)
 	return handlers.NewHandlerData(universityController,
 		subjectController, materialController)
 }

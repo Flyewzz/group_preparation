@@ -44,8 +44,6 @@ func (hd *HandlerData) MaterialFilesDownloadHandler(w http.ResponseWriter, r *ht
 		io.Copy(dst, file)
 	}
 
-	hd.MaterialFileController.Add()
-
 }
 
 // func (hd *HandlerData) AddMaterialFileHandler(w http.ResponseWriter, r *http.Request) {
