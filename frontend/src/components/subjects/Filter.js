@@ -28,6 +28,7 @@ function Filter(props) {
   const [semester, setSemester] = React.useState('');
   const handleChange = event => {
     setSemester(event.target.value);
+    props.onSemesterChange(event);
   };
 
   return (

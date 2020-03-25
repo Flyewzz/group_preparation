@@ -85,10 +85,10 @@ class UniversityPage extends React.Component {
     this.getSubjects(page);
   }
 
-  getSubjects = (page) => {
+  getSubjects = (page, name, semester) => {
     const id = this.props.id;
     this.currPage = page;
-    this.subjectsService.getPage(id, page).then((result) => {
+    this.subjectsService.getPage(id, page, name, semester).then((result) => {
         runInAction(() => {
           this.pageCount = result.pages;
           this.subjects = result.payload ? result.payload : [];
@@ -103,10 +103,15 @@ class UniversityPage extends React.Component {
     this.getSubjects(page);
   };
 
+  onSemesterChange = (event) => {
+    this.semester = event.target.value;
+    this.getSubjects(1, this.name, this.semester);
+  };
+
   render() {
     return (
       <ListContainer title={'Предметы'}
-                     subheader={<Filter/>}
+                     subheader={<Filter onSemesterChange={this.onSemesterChange}/>}
                      currPage={this.currPage}
                      pageCount={this.pageCount}
                      onChange={this.onPageClick}

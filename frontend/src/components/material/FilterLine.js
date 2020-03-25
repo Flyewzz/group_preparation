@@ -42,6 +42,7 @@ function FilterLine(props) {
   const [type, setType] = React.useState('');
   const handleChange = event => {
     setType(event.target.value);
+    props.onTypeChange(event);
   };
 
   return (

@@ -200,7 +200,7 @@ function SubjectPage(props) {
             <div className={styles.name}>
               {props.title}
             </div>
-            <FilterLine/>
+            <FilterLine onTypeChange={props.onTypeChange}/>
             <table className={styles.table}>
               <TableHeader/>
               {props.data.map((value) =>
@@ -260,10 +260,10 @@ class SubjectPageController extends React.Component {
       })
   };
 
-  getMaterials = (page) => {
+  getMaterials = (page, name, type) => {
     const id = this.props.id;
     this.currPage = page;
-    this.materialService.getPage(id, page).then((result) => {
+    this.materialService.getPage(id, page, name, type).then((result) => {
         runInAction(() => {
           this.pageCount = result.pages;
           this.materials = result.payload ? result.payload : [];
@@ -278,12 +278,18 @@ class SubjectPageController extends React.Component {
     this.getMaterials(page);
   };
 
+  onTypeChange = (event) => {
+    this.type = event.target.value;
+    this.getMaterials(1, this.name, this.type);
+  };
+
   render() {
     return (
       <SubjectPage title={this.subject.name}
                    data={this.materials}
                    currPage={this.currPage}
                    pageCount={this.pageCount}
+                   onTypeChange={this.onTypeChange}
                    onChange={this.onPageClick}/>
     )
   }
