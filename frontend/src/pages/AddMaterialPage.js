@@ -74,7 +74,7 @@ class DropzoneAreaExample extends React.Component {
         showFileNames
         dropzoneClass={'dropzone'}
         acceptedFiles={['']}
-        dropzoneText={'Перетащите сюда необходимые файлы или кликните'}
+        dropzoneText={'Перетащите сюда необходимые файлы или нажмите здесь'}
         onChange={this.handleChange.bind(this)}
       />
     )
@@ -83,9 +83,24 @@ class DropzoneAreaExample extends React.Component {
 
 function AddForm(props) {
   const classes = useStyles();
-  const [state, setType] = React.useState('');
-  const handleChange = event => {
+  const [type, setType] = React.useState('');
+  const handleTypeChange = event => {
     setType(event.target.value);
+  };
+
+  const [semester, setSemester] = React.useState('');
+  const handleSemesterChange = event => {
+    setSemester(event.target.value);
+  };
+
+  const [university, setUniversity] = React.useState('');
+  const handleUniversityChange = event => {
+    setUniversity(event.target.value);
+  };
+
+  const [subject, setSubject] = React.useState('');
+  const handleSubjectChange = event => {
+    setSubject(event.target.value);
   };
 
   return (
@@ -95,9 +110,9 @@ function AddForm(props) {
         Новый материал
       </div>
       <div className={classes.paper}>
-        <form onSubmit={props.onSubmit} encType="multipart/form-data" className={classes.form} noValidate>
+        <form action={config.apiUrl + 'subject/16/material'} method={'POST'} encType="multipart/form-data" className={classes.form} noValidate>
           <Grid container spacing={2}>
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={9}>
               <TextField
                 size={'small'}
                 autoComplete="mname"
@@ -110,12 +125,33 @@ function AddForm(props) {
                 autoFocus
               />
             </Grid>
+            <Grid item xs={12} sm={3}>
+              <FormControl size={'small'} required variant="outlined" className={classes.formControl}>
+                <InputLabel htmlFor="university">Тип</InputLabel>
+                <Select
+                  value={type}
+                  onChange={handleTypeChange}
+                  label="Тип"
+                  inputProps={{
+                    name: 'type_id',
+                    id: 'university-select',
+                  }}
+                >
+                  <MenuItem value="">
+                    <em>Любой</em>
+                  </MenuItem>
+                  <MenuItem value={1}>РК</MenuItem>
+                  <MenuItem value={2}>ЛР</MenuItem>
+                  <MenuItem value={3}>ДЗ</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
             <Grid item xs={12} sm={9}>
               <FormControl size={'small'} required variant="outlined" className={classes.formControl}>
                 <InputLabel htmlFor="university">Университет</InputLabel>
                 <Select
-                  value={state}
-                  onChange={handleChange}
+                  value={university}
+                  onChange={handleUniversityChange}
                   label="Университет"
                   inputProps={{
                     name: 'university',
@@ -135,8 +171,8 @@ function AddForm(props) {
               <FormControl size={'small'} required variant="outlined" className={classes.formControl}>
                 <InputLabel htmlFor="outlined-age-native-simple">Семестр</InputLabel>
                 <Select
-                  value={state}
-                  onChange={handleChange}
+                  value={semester}
+                  onChange={handleSemesterChange}
                   label="Семестр"
                   inputProps={{
                     name: 'subject',
@@ -146,9 +182,9 @@ function AddForm(props) {
                   <MenuItem value="">
                     <em>Любой</em>
                   </MenuItem>
-                  <MenuItem value={10}>Ten</MenuItem>
-                  <MenuItem value={20}>Twenty</MenuItem>
-                  <MenuItem value={30}>Thirty</MenuItem>
+                  <MenuItem value={1}>1ый</MenuItem>
+                  <MenuItem value={2}>2ой</MenuItem>
+                  <MenuItem value={3}>3ий</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -156,8 +192,8 @@ function AddForm(props) {
               <FormControl size={'small'} required variant="outlined" className={classes.formControl}>
                 <InputLabel htmlFor="subject">Предмет</InputLabel>
                 <Select
-                  value={state}
-                  onChange={handleChange}
+                  value={subject}
+                  onChange={handleSubjectChange}
                   label="Предмет"
                   inputProps={{
                     name: 'subject',

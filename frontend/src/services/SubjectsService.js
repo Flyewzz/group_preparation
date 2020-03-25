@@ -15,6 +15,14 @@ class SubjectsService {
     return response.json();
   };
 
+  getAll = async (id) => {
+    let url = config.apiUrl + 'university/' + id + '/subjects';
+    const options = {method: 'GET'};
+    const request = new Request(url, options);
+    const response = await fetch(request);
+    return response.json();
+  };
+
   getById = async (id) => {
     let url = config.apiUrl + 'subject?id=' + id;
     const options = {method: 'GET'};

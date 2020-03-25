@@ -9,6 +9,14 @@ class UniversitiesService {
     return response.json();
   };
 
+  getAll = async () => {
+    const url = config.apiUrl + 'universities';
+    const options = {method: 'GET'};
+    const request = new Request(url, options);
+    const response = await fetch(request);
+    return response.json();
+  };
+
   getPage = async (pageNumber) => {
     const url = config.apiUrl + 'universities?page=' + pageNumber;
     const options = {method: 'GET'};
