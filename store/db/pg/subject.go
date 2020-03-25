@@ -54,6 +54,13 @@ func (sc *SubjectControllerPg) GetAllSubjects(universityId, page int) ([]Subject
 	return subjects, nil
 }
 
+func (sc *SubjectControllerPg) GetElementsCount(universityId int) (int, error) {
+	var cnt int
+	err := sc.db.QueryRow("SELECT COUNT(*) FROM subjects "+
+		"WHERE university_id = $1", universityId).Scan(&cnt)
+	return cnt, err
+}
+
 func (sc *SubjectControllerPg) GetById(id int) (*Subject, error) {
 	row := sc.db.QueryRow("SELECT subject_id, university_id, name, semester FROM subjects "+
 		"WHERE subject_id = $1", id)
