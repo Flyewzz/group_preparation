@@ -14,6 +14,7 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import {DropzoneArea} from 'material-ui-dropzone'
 import '../components/material/dropzone.css'
+import config from "../config";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -64,6 +65,7 @@ class DropzoneAreaExample extends React.Component {
     this.setState({
       files: files
     });
+    this.props.onFileAdd(files);
   }
 
   render() {
@@ -193,7 +195,7 @@ function AddForm(props) {
             </Grid>
           </Grid>
           <Grid item xs={12}>
-            <DropzoneAreaExample/>
+            <DropzoneAreaExample onFileAdd={props.onFileAdd}/>
           </Grid>
           <Button
             size={'large'}
@@ -221,6 +223,7 @@ class AddMaterialPage extends React.Component {
   }
 
   universities = [];
+  files = [];
 
   componentDidMount() {
     const page = 1; // TODO get from url
@@ -241,11 +244,24 @@ class AddMaterialPage extends React.Component {
       });
   };
 
-  onSubmit
+  onSubmit = async (event) => {
+    event.preventDefault();
+
+    const data = new FormData();
+    this.files.forEach((file) => {
+      data.append('file', file);
+      data.append('filename', file.name);
+    });
+  };
+
+  onFileAdd = (files) => {
+    this.files = files;
+  };
 
   render() {
     return (
-      <AddForm/>
+      <AddForm onSubmit={this.onSubmit}
+               onFileAdd={this.onFileAdd}/>
     );
   }
 }
