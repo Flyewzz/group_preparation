@@ -67,14 +67,24 @@ func (uc *UniversityControllerPg) GetById(id int) (*University, error) {
 	return &u, nil
 }
 
-func (uc *UniversityControllerPg) Add(name, fullName string) (int, error) {
+func (uc *UniversityControllerPg) Add(name, fullName, iconPath string) (int, error) {
 	var idUniversity int
-	err := uc.db.QueryRow("INSERT INTO universities (name, full_name) VALUES ($1, $2) "+
-		"RETURNING university_id", name, fullName).Scan(&idUniversity)
+	err := uc.db.QueryRow("INSERT INTO universities (name, full_name, icon) "+
+		"VALUES ($1, $2, $3) "+
+		"RETURNING university_id",
+		name, fullName, iconPath).Scan(&idUniversity)
 	if err != nil {
 		return 0, err
 	}
 	return idUniversity, nil
+}
+
+func (uc *UniversityControllerPg) GetAvatar(id int) (string, error) {
+	var iconPath string
+	err := uc.db.QueryRow("SELECT icon from universities "+
+		"WHERE university_id = $1",
+		id).Scan(&iconPath)
+	return iconPath, err
 }
 
 func (uc *UniversityControllerPg) RemoveById(id int) error {

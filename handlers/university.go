@@ -1,8 +1,14 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"log"
+	"os"
+	"path/filepath"
 	"strconv"
 
 	// "log"
@@ -11,6 +17,9 @@ import (
 	"github.com/Flyewzz/group_preparation/errs"
 	"github.com/Flyewzz/group_preparation/features"
 	"github.com/Flyewzz/group_preparation/models"
+	"github.com/gorilla/mux"
+	uuid "github.com/satori/go.uuid"
+	"github.com/spf13/viper"
 )
 
 func (hd *HandlerData) UniversitiesHandler(w http.ResponseWriter, r *http.Request) {
@@ -55,6 +64,36 @@ func (hd *HandlerData) UniversitiesHandler(w http.ResponseWriter, r *http.Reques
 	data, err := json.Marshal(pagesData)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	w.Write(data)
+}
+
+func (hd *HandlerData) AvatarByIdGetHandler(w http.ResponseWriter, r *http.Request) {
+	strId := mux.Vars(r)["id"]
+	id, err := strconv.Atoi(strId)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	iconPath, err := hd.UniversityController.GetAvatar(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "Not found", http.StatusNotFound)
+		} else {
+			http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		}
+		return
+	}
+	file, err := os.Open(iconPath)
+	if err != nil {
+		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+	data, err := ioutil.ReadAll(file)
+	if err != nil {
+		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
 		return
 	}
 	w.Write(data)
@@ -109,14 +148,52 @@ func (hd *HandlerData) UniversityByIdRemoveHandler(w http.ResponseWriter, r *htt
 }
 
 func (hd *HandlerData) AddUniversityHandler(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
+	err := r.ParseMultipartForm(0)
 	if err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
 	name := r.PostFormValue("name")
 	fullName := r.PostFormValue("full_name")
-	addedId, err := hd.UniversityController.Add(name, fullName)
+	file, header, err := r.FormFile("icon")
+	if err != nil {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+	// An icon must not be larger than 1 MB
+	if header.Size > 1*1024*1024 {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+	log.Printf("%v", header.Header)
+	uuid := uuid.NewV4().String()
+	extension := features.GetExtension(header.Filename)
+	if !features.IsExtensionPicture(extension) {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+	dir := viper.GetString("icons.directory")
+	err = os.MkdirAll(dir, os.ModePerm)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	path := filepath.Join(
+		dir,
+		uuid+"."+extension, // Create a name for the file
+	)
+	f, err := os.OpenFile(path,
+		os.O_WRONLY|os.O_CREATE,
+		0666,
+	)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	defer f.Close()
+	io.Copy(f, file)
+	addedId, err := hd.UniversityController.Add(name, fullName, path)
 	if err != nil {
 		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
 		return
