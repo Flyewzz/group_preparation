@@ -8,6 +8,7 @@ func ConfigureHandlers(r *mux.Router, hd *HandlerData) {
 	// University
 	r.HandleFunc("/universities", hd.UniversitiesHandler).Methods("GET")
 	r.HandleFunc("/university", hd.UniversityByIdGetHandler).Methods("GET")
+	r.HandleFunc("/university/{id}/avatar", hd.AvatarByIdGetHandler).Methods("GET")
 	r.HandleFunc("/university", hd.AddUniversityHandler).Methods("POST")
 	r.HandleFunc("/university", hd.UniversityByIdRemoveHandler).Methods("DELETE")
 	r.HandleFunc("/universities", hd.AllUniversitiesRemoveHandler).Methods("DELETE")
@@ -27,8 +28,6 @@ func ConfigureHandlers(r *mux.Router, hd *HandlerData) {
 	r.HandleFunc("/subject/{id}/materials", hd.AllMaterialsRemoveHandler).Methods("DELETE")
 
 	// MaterialFiles
-	// r.HandleFunc("/material/{id}/files", hd.AddMaterialFilesHandler).Methods("POST")
 	r.HandleFunc("/material/{id}/files", hd.GetMaterialFilesHandler).Methods("GET")
 	r.HandleFunc("/material/file/downloading", hd.MaterialFileDownloadHandler).Methods("GET")
-	// r.HandleFunc("/material/{id}/files/downloading", hd.MaterialFilesDownloadHandler).Methods("GET")
 }
