@@ -7,7 +7,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-func NewToken(credentials Credentials, expirationTime time.Time,
+func NewToken(credentials *Credentials, expirationTime time.Time,
 	secretKey string) (string, error) {
 	// Create the JWT claims, which includes the username and expiry time
 	claims := &Claims{
@@ -20,7 +20,7 @@ func NewToken(credentials Credentials, expirationTime time.Time,
 	// Declare the token with the algorithm used for signing, and the claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	// Create the JWT string
-	tokenString, err := token.SignedString(secretKey)
+	tokenString, err := token.SignedString([]byte(secretKey))
 
 	return tokenString, err
 }

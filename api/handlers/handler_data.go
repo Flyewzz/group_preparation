@@ -1,19 +1,21 @@
 package handlers
 
-import "github.com/Flyewzz/group_preparation/interfaces"
+import (
+	. "github.com/Flyewzz/group_preparation/interfaces"
+)
 
 type HandlerData struct {
-	UniversityController interfaces.UniversityController
-	SubjectController    interfaces.SubjectController
-	MaterialController   interfaces.MaterialController
-	AuthController       interfaces.AuthController
+	UniversityController UniversityController
+	SubjectController    SubjectController
+	MaterialController   MaterialController
+	AuthController       AuthController
 }
 
 func NewHandlerData(
-	uc interfaces.UniversityController,
-	sc interfaces.SubjectController,
-	mc interfaces.MaterialController,
-	ac interfaces.AuthController,
+	uc UniversityController,
+	sc SubjectController,
+	mc MaterialController,
+	ac AuthController,
 ) *HandlerData {
 	return &HandlerData{
 		UniversityController: uc,

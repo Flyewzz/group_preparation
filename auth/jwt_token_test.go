@@ -7,7 +7,7 @@ import (
 
 func TestNewToken(t *testing.T) {
 	type args struct {
-		credentials    Credentials
+		credentials    *Credentials
 		expirationTime time.Time
 		secretKey      string
 	}
