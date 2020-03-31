@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 create table universities
 (
   university_id serial        not null
@@ -54,7 +56,7 @@ alter table users
   owner to postgres;
 
 create unique index users_email_uindex
-	on users (email);
+  on users (email);
 
 create table rights
 (
@@ -123,30 +125,35 @@ alter table materialfiles
 
 create table rooms
 (
-  room_id    serial       not null
+  room_id    serial                              not null
     constraint rooms_pk
       primary key,
-  name       varchar(100) not null,
-  subject_id integer      not null
+  name       varchar(100)                        not null,
+  subject_id integer                             not null
     constraint rooms_subjects_subject_id_fk
       references subjects
       on delete cascade,
-  author_id  integer      not null
+  author_id  integer                             not null
     constraint rooms_users_user_id_fk
-      references users
+      references users,
+  uuid       char(36) default uuid_generate_v4() not null
 );
 
 alter table rooms
   owner to postgres;
 
+create unique index rooms_uuid_uindex
+  on rooms (uuid);
+
 create table roomaccess
 (
-  user_id integer not null
+  user_id integer               not null
     constraint roomaccess_users_user_id_fk
       references users,
-  room_id integer not null
+  room_id integer               not null
     constraint roomaccess_rooms_room_id_fk
-      references rooms
+      references rooms,
+  banned  boolean default false not null
 );
 
 alter table roomaccess
@@ -187,3 +194,101 @@ create table roomfiles
 
 alter table roomfiles
   owner to postgres;
+
+create function uuid_nil()
+  immutable
+  strict
+  parallel safe
+  language c
+as -- missing source code
+;
+
+alter function uuid_nil() owner to postgres;
+
+create function uuid_ns_dns()
+  immutable
+  strict
+  parallel safe
+  language c
+as -- missing source code
+;
+
+alter function uuid_ns_dns() owner to postgres;
+
+create function uuid_ns_url()
+  immutable
+  strict
+  parallel safe
+  language c
+as -- missing source code
+;
+
+alter function uuid_ns_url() owner to postgres;
+
+create function uuid_ns_oid()
+  immutable
+  strict
+  parallel safe
+  language c
+as -- missing source code
+;
+
+alter function uuid_ns_oid() owner to postgres;
+
+create function uuid_ns_x500()
+  immutable
+  strict
+  parallel safe
+  language c
+as -- missing source code
+;
+
+alter function uuid_ns_x500() owner to postgres;
+
+create function uuid_generate_v1()
+  strict
+  parallel safe
+  language c
+as -- missing source code
+;
+
+alter function uuid_generate_v1() owner to postgres;
+
+create function uuid_generate_v1mc()
+  strict
+  parallel safe
+  language c
+as -- missing source code
+;
+
+alter function uuid_generate_v1mc() owner to postgres;
+
+create function uuid_generate_v3(namespace uuid, name text)
+  immutable
+  strict
+  parallel safe
+  language c
+as -- missing source code
+;
+
+alter function uuid_generate_v3(uuid, text) owner to postgres;
+
+create function uuid_generate_v4()
+  strict
+  parallel safe
+  language c
+as -- missing source code
+;
+
+alter function uuid_generate_v4() owner to postgres;
+
+create function uuid_generate_v5(namespace uuid, name text)
+  immutable
+  strict
+  parallel safe
+  language c
+as -- missing source code
+;
+
+alter function uuid_generate_v5(uuid, text) owner to postgres;
+

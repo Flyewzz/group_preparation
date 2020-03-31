@@ -32,6 +32,13 @@ func ConfigureHandlers(r *mux.Router, hd *handlers.HandlerData) {
 	r.HandleFunc("/material/{id}/files", hd.GetMaterialFilesHandler).Methods("GET")
 	r.HandleFunc("/material/file/downloading", hd.MaterialFileDownloadHandler).Methods("GET")
 
+	// Rooms
+	r.HandleFunc("/room", hd.GetRoomHandler).Methods("GET")
+	r.HandleFunc("/room", hd.AddRoomHandler).Methods("POST")
+	r.HandleFunc("/rooms", hd.GetRoomsHandler).Methods("GET")
+	r.HandleFunc("/room/{uuid}", hd.JoinRoomHandler).Methods("GET")
+	r.HandleFunc("/room/{id}/ban", hd.BanRoomHandler).Methods("POST")
+
 	// Authentication
 	r.HandleFunc("/signup", hd.SignUpHandler).Methods("POST")
 	r.HandleFunc("/signin", hd.SignInHandler).Methods("POST")
