@@ -46,13 +46,15 @@ create table users
   user_id  serial       not null
     constraint users_pk
       primary key,
-  role_id  integer      not null,
   email    varchar(100) not null,
   password varchar(256) not null
 );
 
 alter table users
   owner to postgres;
+
+create unique index users_email_uindex
+	on users (email);
 
 create table rights
 (
@@ -69,9 +71,6 @@ alter table rights
 
 create unique index rights__index
   on rights (user_id, role_id);
-
-create index rights_user_id_index
-  on rights (user_id);
 
 create table worktypes
 (

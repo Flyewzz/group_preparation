@@ -19,7 +19,7 @@ func NewAuthControllerPg(db *sql.DB) *AuthControllerPg {
 func (ac *AuthControllerPg) SignUp(email, password string) (int, error) {
 	var userId int
 	err := ac.db.QueryRow("INSERT INTO users (email, password) "+
-		"VALUES ($1, $2)", email, password).Scan(&userId)
+		"VALUES ($1, $2) RETURNING user_id", email, password).Scan(&userId)
 	return userId, err
 }
 

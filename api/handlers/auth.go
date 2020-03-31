@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -11,8 +10,10 @@ import (
 func (hd *HandlerData) SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	var creds auth.Credentials
 	// Get the JSON body and decode into credentials
-	err := json.NewDecoder(r.Body).Decode(&creds)
-	if err != nil {
+	params := r.FormValue
+	creds.Email = params("email")
+	creds.Password = params("password")
+	if creds.Email == "" || creds.Password == "" {
 		// If the structure of the body is wrong, return an HTTP error
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
