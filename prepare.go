@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/Flyewzz/group_preparation/api/handlers"
 	"github.com/Flyewzz/group_preparation/db"
-	"github.com/Flyewzz/group_preparation/handlers"
 	"github.com/Flyewzz/group_preparation/store/db/pg"
 	"github.com/spf13/viper"
 )
@@ -29,6 +29,11 @@ func PrepareHandlerData() *handlers.HandlerData {
 	materialFileController := pg.NewMaterialFileControllerPg(db)
 	materialController := pg.NewMaterialControllerPg(viper.GetInt("material.itemsPerPage"), db,
 		*materialFileController)
-	return handlers.NewHandlerData(universityController,
-		subjectController, materialController)
+	authController := pg.NewAuthControllerPg(db)
+	return handlers.NewHandlerData(
+		universityController,
+		subjectController,
+		materialController,
+		authController,
+	)
 }
