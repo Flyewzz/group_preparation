@@ -16,3 +16,5 @@ icons:
     directory: ./icons
 auth:
     secret_key: 12345
+    # In seconds
+    exp_time: 300

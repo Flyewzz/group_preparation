@@ -49,7 +49,8 @@ func (hd *HandlerData) SignInHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	expirationTime := time.Now().Add(5 * time.Minute)
+	expSeconds := viper.GetInt("auth.exp_time")
+	expirationTime := time.Now().Add(time.Duration(expSeconds) * time.Second)
 	token, err := auth.NewToken(
 		&creds,
 		expirationTime,

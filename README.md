@@ -56,6 +56,5 @@
   * **POST** /events/**event_id**/test (parameters: **event_id** - id мероприятия, attributes: **name** - название теста) - создание теста
 
 ### Авторизация и регистрация
-  * /login (attributes: **email**, **password**) - вход 
-  * /logout - выход
-  * /signup (attributes: **email**, **password**, **university**) - регистрация
+  * **POST** /signin (attributes: **email**, **password**) - вход 
+  * **POST** /signup (attributes: **email**, **password**) - регистрация
