@@ -26,6 +26,10 @@
   * **GET** /material/{id}/files (parameters: **id** - id материала) - получение списка всех файлов определенного материала
   * **GET** /material/file/downloading (attributes: **id** - id файла) - скачивание определенного файла по его id
 
+### Авторизация и регистрация
+  * **POST** /signin (attributes: **email**, **password**) - вход 
+  * **POST** /signup (attributes: **email**, **password**) - регистрация
+
 # ⬇️ **Not realized** ⬇️
   
 ### Комнаты
@@ -54,7 +58,3 @@
   * **GET** /questions/**question_id**/answers (parameters: **question_id** - id вопроса) - получение всех тестов для данного мероприятия
   * **GET** /events/**event_id**/test (parameters: **event_id** - id мероприятия, attributes: **id** - id или название теста) - получение конкретного теста
   * **POST** /events/**event_id**/test (parameters: **event_id** - id мероприятия, attributes: **name** - название теста) - создание теста
-
-### Авторизация и регистрация
-  * **POST** /signin (attributes: **email**, **password**) - вход 
-  * **POST** /signup (attributes: **email**, **password**) - регистрация
