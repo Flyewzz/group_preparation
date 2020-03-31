@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Flyewzz/group_preparation/handlers"
+	"github.com/Flyewzz/group_preparation/api"
 	"github.com/rs/cors"
 	"github.com/spf13/viper"
 )
@@ -13,7 +13,7 @@ func main() {
 	PrepareConfig()
 	r := NewRouter()
 	HandlerData := PrepareHandlerData()
-	handlers.ConfigureHandlers(r, HandlerData)
+	api.ConfigureHandlers(r, HandlerData)
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{
 			"*",

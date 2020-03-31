@@ -1,10 +1,11 @@
-package handlers
+package api
 
 import (
+	"github.com/Flyewzz/group_preparation/api/handlers"
 	"github.com/gorilla/mux"
 )
 
-func ConfigureHandlers(r *mux.Router, hd *HandlerData) {
+func ConfigureHandlers(r *mux.Router, hd *handlers.HandlerData) {
 	// University
 	r.HandleFunc("/universities", hd.UniversitiesHandler).Methods("GET")
 	r.HandleFunc("/university", hd.UniversityByIdGetHandler).Methods("GET")
@@ -30,4 +31,8 @@ func ConfigureHandlers(r *mux.Router, hd *HandlerData) {
 	// MaterialFiles
 	r.HandleFunc("/material/{id}/files", hd.GetMaterialFilesHandler).Methods("GET")
 	r.HandleFunc("/material/file/downloading", hd.MaterialFileDownloadHandler).Methods("GET")
+
+	// Authentication
+	r.HandleFunc("/signup", hd.SignUpHandler).Methods("POST")
+	r.HandleFunc("/signin", hd.SignInHandler).Methods("POST")
 }
