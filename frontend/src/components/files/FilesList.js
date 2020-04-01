@@ -15,6 +15,7 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2),
   },
   cardGrid: {
+    width: '100%',
     paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(2),
   },
@@ -24,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
   },
   cardMedia: {
-    paddingTop: '70px',
+    paddingTop: '100px',
   },
   cardContent: {
     padding: '5px 5px 0 5px'
@@ -34,15 +35,17 @@ const useStyles = makeStyles((theme) => ({
   },
   main: {
     width: '100%',
+    height: '100%',
   },
   scroll: {
-    height: '345px',
+    marginTop: '20pt',
+    paddingRight: '15pt',
+    height: '100%',
     width: '100%',
-    overflowY: 'scroll',
   },
 }));
 
-const cards = [1, 2, 3, 4];
+const cards = [1, 2, 3, 4, 5, 6, 8, 9, 10, 11];
 
 function FilesList() {
   const classes = useStyles();
@@ -51,10 +54,9 @@ function FilesList() {
     <div className={classes.scroll}>
       <CssBaseline/>
       <main className={classes.main}>
-        <Container className={classes.cardGrid} maxWidth="sm">
-          <Grid container spacing={4}>
+          <Grid className={classes.main} container spacing={4}>
             {cards.map((card) => (
-              <Grid item key={card} xs={12} sm={6} md={4}>
+              <Grid item key={card} xs={2} sm={4} lg={2}>
                 <Card className={classes.card}>
                   <CardMedia
                     className={classes.cardMedia}
@@ -75,7 +77,6 @@ function FilesList() {
               </Grid>
             ))}
           </Grid>
-        </Container>
       </main>
     </div>
   );

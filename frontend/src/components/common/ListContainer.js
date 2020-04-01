@@ -14,8 +14,6 @@ const useStyles = makeStyles(() => ({
     flexDirection: 'column',
     alignItems: 'center',
     margin: '20pt auto',
-    border: '1px solid #535455',
-    borderRadius: '6px',
     padding: '10pt',
   },
   header: {
@@ -30,7 +28,7 @@ const useStyles = makeStyles(() => ({
 function formList(items) {
   const result = [];
   items.forEach((value, key) => {
-    result.push(<ListItem key={key}>
+    result.push(<ListItem button key={key}>
       {value}
     </ListItem>);
 
@@ -49,7 +47,7 @@ function ListContainer(props) {
   const styles = useStyles();
 
   return (
-    <Container maxWidth="sm" className={styles.wrapper}>
+    <Container maxWidth="lg" className={styles.wrapper}>
       <Typography className={styles.header} variant="h4">
         {props.title}
       </Typography>
@@ -59,6 +57,7 @@ function ListContainer(props) {
       <Pagination count={props.pageCount}
                   page={props.currPage}
                   onChange={props.onChange}
+                  size="large"
                   shape="rounded"
                   color="primary"/>
     </Container>

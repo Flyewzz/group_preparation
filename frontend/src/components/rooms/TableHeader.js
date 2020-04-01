@@ -19,8 +19,8 @@ function TableHeader() {
       <TableRow>
         <TableCell className={styles.bold}>Название</TableCell>
         <TableCell align={'center'} className={styles.bold}>Тип</TableCell>
-        <TableCell align={'center'} className={styles.bold}>Автор</TableCell>
-        <TableCell className={styles.bold} align="right">Рейтинг</TableCell>
+        <TableCell align={'center'} className={styles.bold}>Создатель</TableCell>
+        <TableCell className={styles.bold} align="right">Участников</TableCell>
       </TableRow>
     </TableHead>
   );

@@ -9,6 +9,10 @@ import UniversityPage from "./pages/UniversityPage";
 import SubjectPage from "./pages/SubjectPage";
 import MaterialPage from "./pages/MaterialPage";
 import AddMaterialPage from "./pages/AddMaterialPage";
+import UserService from "./services/UserService";
+
+const userService = new UserService();
+userService.signIn();
 
 function App() {
   return (

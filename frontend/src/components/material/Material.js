@@ -14,15 +14,21 @@ const useStyles = makeStyles(() => ({
     paddingBottom: '4px',
     paddingTop: '4px',
   },
+  text: {
+    fontSize: 'large',
+  },
   positive: {
+    fontSize: 'large',
     fontWeight: 'bold',
     color: '#216416',
   },
   negative: {
+    fontSize: 'large',
     fontWeight: 'bold',
     color: '#A01919',
   },
   zero: {
+    fontSize: 'large',
     fontWeight: 'bold',
     color: '#6B6B6B',
   }
@@ -56,19 +62,20 @@ function Material(props) {
               color="inherit">
           <ListItemText primary={props.material.name}
                         secondary={secondaryText}
-                        className={styles.first}/>
+                        primaryTypographyProps={{className: styles.text}}/>
         </Link>
       </TableCell>
       <TableCell align={'center'} className={styles.cell}>
         <Link component={RouterLink} to={'/material/' + props.material.material_id} className={styles.listItem} underline="none"
               color="inherit">
-          <ListItemText primary={props.material.type}/>
+          <ListItemText primaryTypographyProps={{className: styles.text}}
+            primary={props.material.type}/>
         </Link>
       </TableCell>
       <TableCell align={'center'} className={styles.cell}>
         <Link component={RouterLink} to={'/material/' + props.material.material_id} className={styles.listItem} underline="none"
               color="inherit">
-          <ListItemText className={styles.username}
+          <ListItemText primaryTypographyProps={{className: styles.text}}
                         primary={props.material.user_email}/>
         </Link>
       </TableCell>

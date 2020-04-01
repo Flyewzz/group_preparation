@@ -10,7 +10,7 @@ const useStyles = makeStyles(() => ({
   text: {
     marginRight: 'auto',
     fontWeight: 'bold',
-    fontSize: 'large'
+    fontSize: 'x-large'
   },
   filesText: {
     fontSize: 'medium',
@@ -27,7 +27,7 @@ function Subject(props) {
           color="inherit">
       <ListItemText disableTypography className={styles.text} primary={props.subject.name}/>
       <ListItemSecondaryAction>
-        <Typography >
+        <Typography variant={'h6'}>
           {props.subject.semester}
         </Typography>
       </ListItemSecondaryAction>

@@ -8,6 +8,10 @@ import SubjectsService from "../services/SubjectsService";
 import MaterialService from "../services/MaterialService";
 import {decorate, observable, runInAction} from "mobx";
 import {observer} from "mobx-react";
+import SearchInput from "../components/common/SearchInput";
+import MaterialPathHeader from "../components/material/MaterialPathHeader";
+import InputBase from "@material-ui/core/InputBase";
+import {Search} from "@material-ui/icons";
 
 const data = {
   name: 'РК №1',
@@ -37,18 +41,18 @@ const data = {
 
 const useStyles = makeStyles(() => ({
   wrapper: {
-    width: '95%',
     display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    margin: '20pt auto',
-    border: '1px solid #535455',
-    borderRadius: '6px',
-    padding: '10pt',
+    flexDirection: 'row',
+    height: '100%',
   },
-  name: {
-    fontWeight: 'bold',
-    fontSize: 'xx-large'
+  left: {
+    marginLeft: '55pt',
+  },
+  right: {
+    marginLeft: '30pt',
+    marginTop: '10pt',
+    width: '100%',
+    height: '100%',
   },
   description: {
     fontWeight: 'bold',
@@ -58,10 +62,21 @@ const useStyles = makeStyles(() => ({
   descriptionWrapper: {
     margin: '8pt'
   },
-  download: {
-    marginRight: '5pt',
-    width: 'max-content',
-    marginLeft: 'auto',
+  filesHead: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  inputBox: {
+    display: 'flex',
+    alignItems: 'center',
+    border: '1px solid lightgray',
+    borderRadius: '4px',
+    padding: '3pt 0 0 2pt',
+    marginRight: '15pt',
+    width: '40%'
+  },
+  input: {
+    paddingLeft: '2pt',
   },
 }));
 
@@ -69,20 +84,37 @@ function MaterialPage(props) {
   const styles = useStyles();
 
   return (
-    <Container maxWidth="sm" className={styles.wrapper}>
-      <div className={styles.name}>{props.data.name}</div>
-      <MaterialDetails material={props.data}/>
-      <div className={styles.descriptionWrapper}>
-        <span className={styles.description}>Описание:</span>
-        <span>{data.description}</span>
-      </div>
-      <FilesList/>
-      <div className={styles.download}>
-        <Button variant="contained" color={'primary'}>
-          Скачать все
-        </Button>
-      </div>
-    </Container>
+    <>
+      <MaterialPathHeader university={props.university}
+                          subject={props.subject}
+                          materialName={props.data.name}/>
+      <main className={styles.wrapper}>
+        <div className={styles.left}>
+          <MaterialDetails material={props.data}/>
+          <div className={styles.descriptionWrapper}>
+            <span className={styles.description}>Описание:</span>
+            <span>{data.description}</span>
+          </div>
+        </div>
+        <div className={styles.right}>
+          <div className={styles.filesHead}>
+            <div className={styles.inputBox}>
+              <Search/>
+              <InputBase fullWidth
+                         onChange={props.onChange}
+                         placeholder={props.placeholder}
+                         className={styles.input}
+                         inputProps={{'aria-label': 'search'}}
+              />
+            </div>
+            <Button variant="contained" color={'primary'}>
+              Скачать все
+            </Button>
+          </div>
+          <FilesList/>
+        </div>
+      </main>
+    </>
   );
 }
 
@@ -92,6 +124,8 @@ class MaterialPageController extends React.Component {
     this.materialService = new MaterialService();
   }
 
+  university = {id: -1, name: ''};
+  subject = {id: -1, name: ''};
   material = {date: ''};
 
   componentDidMount() {
@@ -113,7 +147,9 @@ class MaterialPageController extends React.Component {
 
   render() {
     return (
-      <MaterialPage data={this.material}/>
+      <MaterialPage university={this.university}
+                    subject={this.subject}
+                    data={this.material}/>
     );
   }
 }
