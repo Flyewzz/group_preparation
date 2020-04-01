@@ -34,7 +34,7 @@ func ConfigureHandlers(r *mux.Router, hd *handlers.HandlerData) {
 
 	// Rooms
 	r.HandleFunc("/room", hd.GetRoomHandler).Methods("GET")
-	r.HandleFunc("/room", hd.AddRoomHandler).Methods("POST")
+	r.HandleFunc("/subject/{id}/room", hd.AddRoomHandler).Methods("POST")
 	r.HandleFunc("/rooms", hd.GetRoomsHandler).Methods("GET")
 	r.HandleFunc("/room/{uuid}", hd.JoinRoomHandler).Methods("GET")
 	r.HandleFunc("/room/{id}/ban", hd.BanRoomHandler).Methods("POST")

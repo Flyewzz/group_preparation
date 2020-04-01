@@ -4,14 +4,16 @@ import (
 	"time"
 
 	"github.com/Flyewzz/group_preparation/errs"
+	"github.com/Flyewzz/group_preparation/models"
 	"github.com/dgrijalva/jwt-go"
 )
 
-func NewToken(credentials *Credentials, expirationTime time.Time,
+func NewToken(user *models.User, expirationTime time.Time,
 	secretKey string) (string, error) {
 	// Create the JWT claims, which includes the username and expiry time
 	claims := &Claims{
-		Email: credentials.Email,
+		UserId: user.Id,
+		Email:  user.Email,
 		StandardClaims: jwt.StandardClaims{
 			// In JWT, the expiry time is expressed as unix milliseconds
 			ExpiresAt: expirationTime.Unix(),
@@ -25,10 +27,9 @@ func NewToken(credentials *Credentials, expirationTime time.Time,
 	return tokenString, err
 }
 
-func DecodeToken(strToken, secretKey string) (string, error) {
+func DecodeToken(strToken, secretKey string) (*models.User, error) {
 	// Initialize a new instance of `Claims`
 	claims := &Claims{}
-
 	// Parse the JWT string and store the result in `claims`.
 	// Note that we are passing the key in this method as well. This method will return an error
 	// if the token is invalid (if it has expired according to the expiry time we set on sign in),
@@ -37,10 +38,14 @@ func DecodeToken(strToken, secretKey string) (string, error) {
 		return []byte(secretKey), nil
 	})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	if !token.Valid {
-		return "", errs.TokenIsNotValid
+		return nil, errs.TokenIsNotValid
 	}
-	return claims.Email, nil
+	u := &models.User{
+		Id:    claims.UserId,
+		Email: claims.Email,
+	}
+	return u, nil
 }

@@ -136,7 +136,10 @@ create table rooms
   author_id  integer                             not null
     constraint rooms_users_user_id_fk
       references users,
-  uuid       char(36) default uuid_generate_v4() not null
+  uuid       char(36) default uuid_generate_v4() not null,
+  type_id    integer                             not null
+    constraint rooms_worktypes_type_id_fk
+      references worktypes
 );
 
 alter table rooms

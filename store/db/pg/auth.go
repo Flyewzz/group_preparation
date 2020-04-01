@@ -25,7 +25,11 @@ func (ac *AuthControllerPg) SignUp(email, password string) (int, error) {
 
 func (ac *AuthControllerPg) GetUser(email string) (*models.User, error) {
 	var user *models.User = &models.User{}
-	err := ac.db.QueryRow("SELECT email, password FROM users "+
-		"WHERE email = $1", email).Scan(&user.Email, &user.Password)
+	err := ac.db.QueryRow("SELECT user_id, email, password FROM users "+
+		"WHERE email = $1", email).Scan(
+		&user.Id,
+		&user.Email,
+		&user.Password,
+	)
 	return user, err
 }

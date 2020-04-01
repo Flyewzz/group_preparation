@@ -52,7 +52,7 @@ func (hd *HandlerData) SignInHandler(w http.ResponseWriter, r *http.Request) {
 	expSeconds := viper.GetInt("auth.exp_time")
 	expirationTime := time.Now().Add(time.Duration(expSeconds) * time.Second)
 	token, err := auth.NewToken(
-		&creds,
+		user,
 		expirationTime,
 		viper.GetString("auth.secret_key"),
 	)

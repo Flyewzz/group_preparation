@@ -9,6 +9,7 @@ type HandlerData struct {
 	SubjectController    SubjectController
 	MaterialController   MaterialController
 	AuthController       AuthController
+	RoomController       RoomController
 }
 
 func NewHandlerData(
@@ -16,11 +17,13 @@ func NewHandlerData(
 	sc SubjectController,
 	mc MaterialController,
 	ac AuthController,
+	rc RoomController,
 ) *HandlerData {
 	return &HandlerData{
 		UniversityController: uc,
 		SubjectController:    sc,
 		MaterialController:   mc,
 		AuthController:       ac,
+		RoomController:       rc,
 	}
 }

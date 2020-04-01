@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/Flyewzz/group_preparation/auth"
@@ -56,7 +57,7 @@ func (amw *AuthenticationMiddleware) Middleware(next http.Handler) http.Handler 
 
 		// Get the JWT string from the cookie
 		tokenString := c.Value
-		_, err = auth.DecodeToken(tokenString, viper.GetString("auth.secret_key"))
+		user, err := auth.DecodeToken(tokenString, viper.GetString("auth.secret_key"))
 		if err != nil {
 			if err == errs.TokenIsNotValid {
 				http.Error(w, "Forbidden", http.StatusForbidden)
@@ -68,6 +69,13 @@ func (amw *AuthenticationMiddleware) Middleware(next http.Handler) http.Handler 
 		// Finally
 		// user's email given in the token
 		// We found the token
+		ctx := r.Context()
+		// Write user data to the context
+		claims := auth.Claims{
+			UserId: user.Id,
+			Email:  user.Email,
+		}
+		r = r.WithContext(context.WithValue(ctx, "user_claims", claims))
 		next.ServeHTTP(w, r)
 	})
 }

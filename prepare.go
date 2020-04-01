@@ -30,10 +30,12 @@ func PrepareHandlerData() *handlers.HandlerData {
 	materialController := pg.NewMaterialControllerPg(viper.GetInt("material.itemsPerPage"), db,
 		*materialFileController)
 	authController := pg.NewAuthControllerPg(db)
+	roomController := pg.NewRoomControllerPg(db)
 	return handlers.NewHandlerData(
 		universityController,
 		subjectController,
 		materialController,
 		authController,
+		roomController,
 	)
 }
