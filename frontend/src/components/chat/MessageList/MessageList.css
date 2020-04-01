@@ -1,0 +1,11 @@
+.message-list {
+  height: 452pt;
+}
+
+.message-list-container {
+  border-left: 1px solid lightgrey;
+  height: 100%;
+  width: 100%;
+  padding: 5pt;
+  overflow-y: scroll;
+}

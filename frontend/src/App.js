@@ -10,6 +10,7 @@ import SubjectPage from "./pages/SubjectPage";
 import MaterialPage from "./pages/MaterialPage";
 import AddMaterialPage from "./pages/AddMaterialPage";
 import UserService from "./services/UserService";
+import RoomPage from "./pages/RoomPage";
 
 const userService = new UserService();
 userService.signIn();
@@ -36,6 +37,9 @@ function App() {
         }/>
         <Route path="/add_material/:id" render={(props) =>
           <AddMaterialPage id={props.match.params.id}/>
+        }/>
+        <Route path="/room/:id" render={(props) =>
+          <RoomPage id={props.match.params.id}/>
         }/>
       </Switch>
     </div>

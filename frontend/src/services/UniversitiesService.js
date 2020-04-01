@@ -11,7 +11,7 @@ class UniversitiesService {
 
   getById = async (id) => {
     const url = config.apiUrl + `university?id=${id}`;
-    const options = {method: 'GET'};
+    const options = {method: 'GET', credentials: 'include'};
     const request = new Request(url, options);
     const response = await fetch(request);
     return response.json();
@@ -19,7 +19,7 @@ class UniversitiesService {
 
   getAll = async () => {
     const url = config.apiUrl + 'universities';
-    const options = {method: 'GET'};
+    const options = {method: 'GET', credentials: 'include'};
     const request = new Request(url, options);
     const response = await fetch(request);
     return response.json();
@@ -27,7 +27,7 @@ class UniversitiesService {
 
   getPage = async (pageNumber) => {
     const url = config.apiUrl + 'universities?page=' + pageNumber;
-    const options = {method: 'GET'};
+    const options = {method: 'GET', credentials: 'include'};
     const request = new Request(url, options);
     const response = await fetch(request);
     return response.json();

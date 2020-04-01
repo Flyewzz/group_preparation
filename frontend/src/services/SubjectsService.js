@@ -9,7 +9,7 @@ class SubjectsService {
     if (semester) {
       url += '&semester=' + semester;
     }
-    const options = {method: 'GET'};
+    const options = {method: 'GET', credentials: 'include'};
     const request = new Request(url, options);
     const response = await fetch(request);
     return response.json();
@@ -17,7 +17,7 @@ class SubjectsService {
 
   getAll = async (id) => {
     let url = config.apiUrl + 'university/' + id + '/subjects';
-    const options = {method: 'GET'};
+    const options = {method: 'GET', credentials: 'include'};
     const request = new Request(url, options);
     const response = await fetch(request);
     return response.json();

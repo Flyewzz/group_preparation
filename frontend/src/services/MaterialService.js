@@ -9,7 +9,7 @@ class MaterialService {
     if (typeId) {
       url += '&type_id=' + typeId;
     }
-    const options = {method: 'GET'};
+    const options = {method: 'GET', credentials: 'include'};
     const request = new Request(url, options);
     const response = await fetch(request);
     return response.json();
@@ -17,7 +17,7 @@ class MaterialService {
 
   getById = async (id) => {
     const url = config.apiUrl + 'material?id=' + id ;
-    const options = {method: 'GET'};
+    const options = {method: 'GET', credentials: 'include'};
     const request = new Request(url, options);
     const response = await fetch(request);
     return response.json();
