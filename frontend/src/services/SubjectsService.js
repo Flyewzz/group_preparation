@@ -25,7 +25,7 @@ class SubjectsService {
 
   getById = async (id) => {
     let url = config.apiUrl + 'subject?id=' + id;
-    const options = {method: 'GET'};
+    const options = {method: 'GET', credentials: 'include'};
     const request = new Request(url, options);
     const response = await fetch(request);
     return response.json();
