@@ -85,11 +85,11 @@ func (hd *HandlerData) GetRoomsHandler(w http.ResponseWriter, r *http.Request) {
 
 func (hd *HandlerData) JoinRoomHandler(w http.ResponseWriter, r *http.Request) {
 	uuid := mux.Vars(r)["uuid"]
-	userData := r.Context().Value("user_claims").(auth.Claims)
 	if uuid == "" {
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
+	userData := r.Context().Value("user_claims").(auth.Claims)
 	err := hd.RoomController.Join(userData.UserId, uuid)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -97,9 +97,63 @@ func (hd *HandlerData) JoinRoomHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
-		return
 	}
 }
 
 func (hd *HandlerData) BanRoomHandler(w http.ResponseWriter, r *http.Request) {
+	strId := mux.Vars(r)["id"]
+	roomId, err := strconv.Atoi(strId)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	if roomId < 1 {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	authorData := r.Context().Value("user_claims").(auth.Claims)
+	expectedAuthorId, err := hd.RoomController.GetAuthorId(roomId)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	// Only the author of the room can ban/unban other users
+	// Check permissions
+	if authorData.UserId != expectedAuthorId {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+	err = r.ParseForm()
+	if err != nil {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+	params := r.PostFormValue
+
+	strBlockId := params("user_id")
+	blockingUserId, err := strconv.Atoi(strBlockId)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	// The author of the room cannot ban himself
+	if blockingUserId < 1 || blockingUserId == authorData.UserId {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	strStatus := params("status")
+	status, err := strconv.ParseBool(strStatus)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+
+	err = hd.RoomController.Ban(authorData.UserId, roomId, status)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "Not found", http.StatusNotFound)
+		} else {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+	}
 }

@@ -52,7 +52,7 @@ func (rc *RoomControllerPg) Add(name string, subjectId, typeId, authorId int) (i
 
 func (rc *RoomControllerPg) Ban(userId, roomId int, status bool) error {
 	result, err := rc.db.Exec("UPDATE roomaccess SET banned = $1 "+
-		"WHERE user_id = $2, room_id = $3", status, userId, roomId)
+		"WHERE user_id = $2 AND room_id = $3", status, userId, roomId)
 	if err != nil {
 		return err
 	}
@@ -121,4 +121,11 @@ func (rc *RoomControllerPg) GetById(id int) (*room.RoomData, error) {
 		&r.AuthorEmail,
 	)
 	return r, err
+}
+
+func (rc *RoomControllerPg) GetAuthorId(roomId int) (int, error) {
+	var authorId int
+	err := rc.db.QueryRow("SELECT author_id FROM rooms "+
+		"WHERE room_id = $1", roomId).Scan(&authorId)
+	return authorId, err
 }
