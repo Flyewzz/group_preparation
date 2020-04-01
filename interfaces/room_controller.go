@@ -11,4 +11,5 @@ type RoomController interface {
 	Join(userId int, uuid string) error
 	GetAll(userId int) ([]room.RoomData, error)
 	GetAuthorId(roomId int) (int, error)
+	IsBanned(userId, roomId int) (bool, error)
 }

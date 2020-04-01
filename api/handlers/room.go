@@ -11,6 +11,38 @@ import (
 )
 
 func (hd *HandlerData) GetRoomHandler(w http.ResponseWriter, r *http.Request) {
+	strId := r.URL.Query().Get("id")
+	roomId, err := strconv.Atoi(strId)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	if roomId < 1 {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+
+	userData := r.Context().Value("user_claims").(auth.Claims)
+	banned, err := hd.RoomController.IsBanned(userData.UserId, roomId)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	if banned {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+	room, err := hd.RoomController.GetById(roomId)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	data, err := json.Marshal(room)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	w.Write(data)
 }
 
 func (hd *HandlerData) AddRoomHandler(w http.ResponseWriter, r *http.Request) {
@@ -148,7 +180,7 @@ func (hd *HandlerData) BanRoomHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = hd.RoomController.Ban(authorData.UserId, roomId, status)
+	err = hd.RoomController.Ban(blockingUserId, roomId, status)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			http.Error(w, "Not found", http.StatusNotFound)

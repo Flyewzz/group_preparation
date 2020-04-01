@@ -109,15 +109,14 @@ func (rc *RoomControllerPg) GetAll(userId int) ([]room.RoomData, error) {
 
 func (rc *RoomControllerPg) GetById(id int) (*room.RoomData, error) {
 	r := &room.RoomData{}
-	err := rc.db.QueryRow("SELECT r.room_id, r.name, r.uuid "+
-		"s.name, u.email FROM rooms r "+
-		"INNER JOIN subjects s ON r.subject_id = s.subject_id "+
+	err := rc.db.QueryRow("SELECT r.room_id, r.name, r.uuid, "+
+		"r.subject_id, u.email FROM rooms r "+
 		"INNER JOIN users u ON r.author_id = u.user_id "+
 		"WHERE r.room_id = $1", id).Scan(
 		&r.RoomId,
 		&r.Name,
 		&r.UUID,
-		&r.SubjectName,
+		&r.SubjectId,
 		&r.AuthorEmail,
 	)
 	return r, err
@@ -128,4 +127,11 @@ func (rc *RoomControllerPg) GetAuthorId(roomId int) (int, error) {
 	err := rc.db.QueryRow("SELECT author_id FROM rooms "+
 		"WHERE room_id = $1", roomId).Scan(&authorId)
 	return authorId, err
+}
+
+func (rc *RoomControllerPg) IsBanned(userId, roomId int) (bool, error) {
+	var banned bool
+	err := rc.db.QueryRow("SELECT banned FROM roomaccess "+
+		"WHERE user_id = $1 AND room_id = $2 ", userId, roomId).Scan(&banned)
+	return banned, err
 }
