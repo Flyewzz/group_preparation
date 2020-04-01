@@ -73,8 +73,8 @@ func (rc *RoomControllerPg) Join(userId int, uuid string) error {
 	}
 	// And after that join the user to this
 	_, err = rc.db.Exec("INSERT INTO roomaccess (user_id, room_id) "+
-		"VALUES ($1, $2)", roomId, userId)
-	return nil
+		"VALUES ($1, $2)", userId, roomId)
+	return err
 }
 
 func (rc *RoomControllerPg) GetAll(userId int) ([]room.RoomData, error) {

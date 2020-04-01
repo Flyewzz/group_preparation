@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -83,6 +84,21 @@ func (hd *HandlerData) GetRoomsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (hd *HandlerData) JoinRoomHandler(w http.ResponseWriter, r *http.Request) {
+	uuid := mux.Vars(r)["uuid"]
+	userData := r.Context().Value("user_claims").(auth.Claims)
+	if uuid == "" {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	err := hd.RoomController.Join(userData.UserId, uuid)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "Not found", http.StatusNotFound)
+		} else {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
 }
 
 func (hd *HandlerData) BanRoomHandler(w http.ResponseWriter, r *http.Request) {
